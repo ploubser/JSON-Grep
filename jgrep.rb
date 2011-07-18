@@ -2,6 +2,8 @@
 
 require 'parser/parser.rb'
 require 'parser/scanner.rb'
+require 'rubygems'
+require 'json'
 
 module JGrep
 
@@ -10,13 +12,16 @@ module JGrep
         begin
             call_stack = Parser.new(expression).execution_stack
             result = []
+            json = JSON.parse(json)
             json.each do |document|
                 if eval_statement(document, call_stack)
                     result << document
                 end
             end
-            return result
+            return result.to_json
+
         rescue NameError => e
+            pp e
             var = e.to_s
             STDERR.puts "Error. #{var.match(/`.*'/)} was not found in documents"
             exit 1
