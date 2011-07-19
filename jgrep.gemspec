@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
     s.description = "Compare a list of json documents to a simple logical language and returns matches as output"
     s.email = ["ploubser@gmail.com"]
     s.executables = ["jgrep"]
-    s.files = ["jgrep.gemspec", "bin/jgrep", Dir.glob("lib/*")].flatten
+    s.files = ["jgrep.gemspec", "bin/jgrep", Dir.glob("lib/*"), Dir.glob("lib/parser/*")].flatten
     s.has_rdoc = true
     s.homepage = "https://github.com/psy1337/JSON-Grep"
     s.require_paths = ["lib"]
