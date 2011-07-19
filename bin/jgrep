@@ -48,7 +48,7 @@ begin
                 end
             end
             unless r.nil?
-                (!r.is_a?(Array) || !r.is_a?(Hash)) ? puts(r) : puts(JSON.pretty_generate(r))
+                (!r.is_a?(Array) && !r.is_a?(Hash)) ? puts(r) : puts(JSON.pretty_generate(r))
             end
         end
     end

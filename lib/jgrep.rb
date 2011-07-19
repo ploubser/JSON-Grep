@@ -4,6 +4,7 @@ require 'parser/parser.rb'
 require 'parser/scanner.rb'
 require 'rubygems'
 require 'json'
+require 'pp'
 
 module JGrep
 
@@ -20,11 +21,6 @@ module JGrep
             end
             return result
 
-        rescue NameError => e
-            var = e.to_s
-            STDERR.puts "Error. #{var.match(/`(.*)'/)} was not found in documents"
-            exit 1
-
         rescue JSON::ParserError => e
             STDERR.puts "Error. Invalid JSON given"
             exit 1
@@ -33,6 +29,8 @@ module JGrep
 
     #Correctly format values so we can do the correct type of comparison
     def self.format(kvalue, value)
+        puts kvalue
+        puts value
         if kvalue =~ /^\d+$/ || value =~ /^\d+$/
             return Integer(kvalue), Integer(value)
         elsif kvalue =~ /^\d+.\d+$/ || value =~ /^\d+.\d+$/
@@ -122,7 +120,11 @@ module JGrep
                             when  /not|\!/
                                 result << "!"
                             when "statement"
-                                new_statement = token[1].split(".").last
+                                op = token[1].match(/.*<=|>=|=|<|>/)
+                                left = token[1].split(op[0]).first.split(".").last
+                                right = token[1].split(op[0]).last
+                                new_statement = left + op[0] + right
+#                                new_statement = token[1].split(/<=|>=|=|<|>/).first.split(".").last + token[1].split(/<=|>=|=|<|>/).last
                                 result << has_object?(doc, new_statement)
                         end
                     end
