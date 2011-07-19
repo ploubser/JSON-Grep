@@ -18,7 +18,7 @@ module JGrep
                     result << document
                 end
             end
-            return result.to_json
+            return result
 
         rescue NameError => e
             var = e.to_s

@@ -1,7 +1,21 @@
 #!/usr/bin/env ruby
 
 require 'jgrep'
-require 'pp'
+require 'optparse'
+
+options = {:flat => false}
+
+OptionParser.new do |opts|
+    opts.banner = "Usage: jgrep [options] \"expression\""
+    opts.on("-s", "--simple FIELD", "Display a single field from each of the resulting json documents") do |field|
+        options[:field] = field
+    end
+    opts.on("-f", "--flat", "Display non pretty json") do
+        options[:flat] = true
+    end
+
+end.parse!
+
 
 begin
     raise "Please pass a valid arugment to jgrep" if ARGV == [] || ARGV ==["-s"]
@@ -13,18 +27,20 @@ end
 begin
     json = STDIN.read
 
-    unless ARGV[0] == "-s"
-        result = JGrep::jgrep((json), ARGV[0])
-        puts result unless result == "[]"
+    unless options[:field]
+        result = JGrep::jgrep((json), ARGV.last)
+        unless result == "[]"
+            (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
+        end
     else
-        if ARGV[1] =~ /=|<|>/
-            raise "'-s' flag requires a object to display"
+        if options[:field] =~ /=|<|>/
+            raise "'-s' flag requires a field to display"
         end
 
-        result = JSON.parse(JGrep::jgrep((json), ARGV[2]))
+        result = JGrep::jgrep((json), ARGV.last)
 
         result.each do |r|
-            ARGV[1].split(".").each do |node|
+            options[:field].split(".").each do |node|
                 unless r.is_a? Array
                     r = r[node]
                 else
@@ -32,7 +48,7 @@ begin
                 end
             end
             unless r.nil?
-                (r.is_a?(String)) ? puts(r) : pp(r)
+                (!r.is_a?(Array) || !r.is_a?(Hash)) ? puts(r) : puts(JSON.pretty_generate(r))
             end
         end
     end
@@ -40,4 +56,3 @@ rescue Exception => e
     STDERR.puts "Error - #{e}"
     exit 1
 end
-
