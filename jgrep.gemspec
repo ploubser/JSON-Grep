@@ -5,10 +5,10 @@ Gem::Specification.new do |s|
     s.authors = ["P Loubser"]
     s.date = %q{2011-07-19}
     s.default_executable = "jgrep"
-    s.decription = "Compare a list of json documents to a simple logical language and returns matches as output"
+    s.description = "Compare a list of json documents to a simple logical language and returns matches as output"
     s.email = ["ploubser@gmail.com"]
-    s.executeables = ["jgrep"]
-    s.files = ["jgrep.gemspec", "bin/jgrep", "lib/*"]
+    s.executables = ["jgrep"]
+    s.files = ["jgrep.gemspec", "bin/jgrep", Dir.glob("lib/*")].flatten
     s.has_rdoc = true
     s.homepage = "https://github.com/psy1337/JSON-Grep"
     s.require_paths = ["lib"]
