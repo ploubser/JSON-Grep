@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require File.dirname(__FILE__) + "/../../jgrep"
+require File.dirname(__FILE__) + "/../spec_helper"
 
 module JGrep
     describe Scanner do

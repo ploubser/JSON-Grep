@@ -21,9 +21,12 @@ module JGrep
             return result.to_json
 
         rescue NameError => e
-            pp e
             var = e.to_s
-            STDERR.puts "Error. #{var.match(/`.*'/)} was not found in documents"
+            STDERR.puts "Error. #{var.match(/`(.*)'/)} was not found in documents"
+            exit 1
+
+        rescue JSON::ParserError => e
+            STDERR.puts "Error. Invalid JSON given"
             exit 1
         end
     end
@@ -68,7 +71,7 @@ module JGrep
         when "<="
             (tmp <= value) ? (return true) : (return false)
         when ">="
-            (tmp == value) ? (return true) : (return false)
+            (tmp >= value) ? (return true) : (return false)
         when ">"
             (tmp > value) ? (return true) : (return false)
         when "<"
