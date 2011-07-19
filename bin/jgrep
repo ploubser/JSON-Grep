@@ -1,16 +1,43 @@
 #!/usr/bin/env ruby
 
 require 'jgrep'
+require 'pp'
 
 begin
-    raise "Please pass a valid arugment to jgrep" if ARGV == []
+    raise "Please pass a valid arugment to jgrep" if ARGV == [] || ARGV ==["-s"]
 rescue Exception => e
     STDERR.puts e
     exit 1
 end
 
-json = STDIN.read
+begin
+    json = STDIN.read
 
+    unless ARGV[0] == "-s"
+        result = JGrep::jgrep((json), ARGV[0])
+        puts result unless result == "[]"
+    else
+        if ARGV[1] =~ /=|<|>/
+            raise "'-s' flag requires a object to display"
+        end
 
-result = JGrep::jgrep((json), ARGV[0])
-puts result unless result == "[]"
+        result = JSON.parse(JGrep::jgrep((json), ARGV[2]))
+
+        result.each do |r|
+            ARGV[1].split(".").each do |node|
+                unless r.is_a? Array
+                    r = r[node]
+                else
+                    break
+                end
+            end
+            unless r.nil?
+                (r.is_a?(String)) ? puts(r) : pp(r)
+            end
+        end
+    end
+rescue Exception => e
+    STDERR.puts "Error - #{e}"
+    exit 1
+end
+

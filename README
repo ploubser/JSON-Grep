@@ -4,6 +4,9 @@ Installation:
 
 gem install jgrep
 
+Flags:
+-s [document field] : Greps the json and only returns the value of the field specified
+
 Statements:
 
 A statement is defined as some value in a json document compared to another value.
