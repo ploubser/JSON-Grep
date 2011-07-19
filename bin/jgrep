@@ -2,7 +2,15 @@
 
 require 'jgrep'
 
+begin
+    raise "Please pass a valid arugment to jgrep" if ARGV == []
+rescue Exception => e
+    STDERR.puts e
+    exit 1
+end
+
 json = STDIN.read
+
 
 result = JGrep::jgrep((json), ARGV[0])
 puts result unless result == "[]"
