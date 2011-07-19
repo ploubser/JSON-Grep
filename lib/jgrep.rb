@@ -29,8 +29,6 @@ module JGrep
 
     #Correctly format values so we can do the correct type of comparison
     def self.format(kvalue, value)
-        puts kvalue
-        puts value
         if kvalue =~ /^\d+$/ || value =~ /^\d+$/
             return Integer(kvalue), Integer(value)
         elsif kvalue =~ /^\d+.\d+$/ || value =~ /^\d+.\d+$/
