@@ -29,9 +29,9 @@ module JGrep
 
     #Correctly format values so we can do the correct type of comparison
     def self.format(kvalue, value)
-        if kvalue =~ /^\d+$/ || value =~ /^\d+$/
+        if kvalue =~ /^\d+$/ && value =~ /^\d+$/
             return Integer(kvalue), Integer(value)
-        elsif kvalue =~ /^\d+.\d+$/ || value =~ /^\d+.\d+$/
+        elsif kvalue =~ /^\d+.\d+$/ && value =~ /^\d+.\d+$/
             return Float(kvalue), Float(value)
         else
             return kvalue, value
