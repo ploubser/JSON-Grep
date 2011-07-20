@@ -4,7 +4,6 @@ require 'parser/parser.rb'
 require 'parser/scanner.rb'
 require 'rubygems'
 require 'json'
-require 'pp'
 
 module JGrep
 
@@ -29,9 +28,9 @@ module JGrep
 
     #Correctly format values so we can do the correct type of comparison
     def self.format(kvalue, value)
-        if kvalue =~ /^\d+$/ && value =~ /^\d+$/
+        if kvalue.to_s =~ /^\d+$/ && value.to_s =~ /^\d+$/
             return Integer(kvalue), Integer(value)
-        elsif kvalue =~ /^\d+.\d+$/ && value =~ /^\d+.\d+$/
+        elsif kvalue.to_s =~ /^\d+.\d+$/ && value.to_s =~ /^\d+.\d+$/
             return Float(kvalue), Float(value)
         else
             return kvalue, value
