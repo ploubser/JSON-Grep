@@ -16,19 +16,28 @@ OptionParser.new do |opts|
 
 end.parse!
 
-
 begin
-    raise "Please pass a valid arugment to jgrep" if ARGV == [] || ARGV ==["-s"]
-rescue Exception => e
-    STDERR.puts e
-    exit 1
-end
+    expression = nil
 
-begin
-    json = STDIN.read
+    ARGV.each do |argument|
+        if argument =~ /<|>|=/
+            expression = argument
+            ARGV.delete(argument)
+        end
+    end
+
+    unless STDIN.tty?
+        json = STDIN.read
+    else
+        if ARGV.size == 1
+            json = File.read(ARGV.first)
+        else
+            raise "No json input specified"
+        end
+    end
 
     unless options[:field]
-        result = JGrep::jgrep((json), ARGV.last)
+        result = JGrep::jgrep((json), expression)
         unless result == "[]"
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
         end
@@ -37,7 +46,7 @@ begin
             raise "'-s' flag requires a field to display"
         end
 
-        result = JGrep::jgrep((json), ARGV.last)
+        result = JGrep::jgrep((json), expression)
 
         result.each do |r|
             options[:field].split(".").each do |node|

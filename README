@@ -1,4 +1,6 @@
-JGrep usage : foo.json | jgrep "foo.bar=1"
+JGrep usage:    jgrep "foo.bar=1" foo.json
+             or
+                cat "foo.json" | jgrep "foo.bar=1"
 
 Installation:
 
