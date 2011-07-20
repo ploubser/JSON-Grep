@@ -21,9 +21,9 @@ Complex statements:
     Statements can be combined to form logical sentences. Order of precedence can be set with '(' and ')'
     Available logical operaters are 'and', 'or', '!'.
 
-Example: !(foo.bar=1) and (foo=bar)
+    Example: !(foo.bar=1) and (foo=bar)
 
-    In document comparison:
+In document comparison:
 
     If a document contains an array, the '[' and ']' operators can be used to define a comparison where
     statements are checked for truth on a per element basis.
