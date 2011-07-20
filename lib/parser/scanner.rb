@@ -93,32 +93,6 @@ module JGrep
                             break
                         end
                     end until (j >= @arguments.size) || (@arguments.split("")[j] =~ /\//)
-
-                #Recondsider this bit. Don't see there being a case for it. (Pieter)
-#                elsif (@arguments.split("")[j] =~ /=|<|>/)
-#                    while !(@arguments.split("")[j] =~ /=|<|>/)
-#                        current_token_value << @arguments.split("")[j]
-#                        j += 1
-#                    end
-#
-#                    current_token_value << @arguments.split("")[j]
-#                    j += 1
-#
-#                    if @arguments.split("")[j] == "/"
-#                        begin
-#                            current_token_value << @arguments.split("")[j]
-#                            j += 1
-#                            if @arguments.split("")[j] == "/"
-#                                current_token_value << "/"
-#                                 break
-#                            end
-#                        end until (j >= @arguments.size) || (@arguments.split("")[j] =~ /\//)
-#                    else
-#                        while (j < @arguments.size) && ((@arguments.split("")[j] != " ") && (@arguments.split("")[j] != ")") && @arguments.split("")[j] != "]" )
-#                            current_token_value << @arguments.split("")[j]
-#                            j += 1
-#                        end
-#                    end
                 else
                     begin
                         current_token_value << @arguments.split("")[j]
