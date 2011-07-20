@@ -62,8 +62,7 @@ module JGrep
                 end
             end
         rescue NoMethodError => e
-            pp e
-            raise "Cannot end statement with 'and', 'or', 'not'"
+            raise "Error. Expression cannot be parsed."
         end
 
         private

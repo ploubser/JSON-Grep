@@ -8,7 +8,7 @@ module JGrep
 
             it "should return a valid json document" do
                 result = JGrep::jgrep("[{\"foo\":1}]", "foo=1")
-                result.should == "[{\"foo\":1}]"
+                result.should == [{"foo"=>1}]
             end
 
             it "should fail on an invalid json document" do
@@ -20,7 +20,7 @@ module JGrep
 
             it "should return '[]' if value is not present in document" do
                 result = JGrep::jgrep("[{\"bar\":1}]", "foo=1")
-                result.should == "[]"
+                result.should == []
             end
 
         end

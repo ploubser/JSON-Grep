@@ -11,6 +11,7 @@
 ###Flags:###
     -s [document field] : Greps the json and only returns the value of the field specified
     -f                  : Display ugly json
+    -v                  : Display verbose outpt
 
 ###Statements:###
 

@@ -13,6 +13,9 @@ OptionParser.new do |opts|
     opts.on("-f", "--flat", "Display non pretty json") do
         options[:flat] = true
     end
+    opts.on("-v", "--verbose", "Verbose output") do
+        JGrep::verbose_on
+    end
 
 end.parse!
 
@@ -41,7 +44,7 @@ begin
 
     unless options[:field]
         result = JGrep::jgrep((json), expression)
-        unless result == "[]"
+        unless result == []
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
         end
     else

@@ -4,26 +4,48 @@ require 'parser/parser.rb'
 require 'parser/scanner.rb'
 require 'rubygems'
 require 'json'
+require 'pp'
 
 module JGrep
+    @verbose = false
+
+    def self.verbose_on
+        @verbose = true
+    end
 
     #Method parses json and returns documents that match the logical expression
     def self.jgrep(json, expression)
+        errors = ""
         begin
             call_stack = Parser.new(expression).execution_stack
             result = []
             json = JSON.parse(json)
             json.each do |document|
-                if eval_statement(document, call_stack)
-                    result << document
+                begin
+                    if eval_statement(document, call_stack)
+                        result << document
+                    end
+                rescue Exception => e
+                    if @verbose
+                        pp document
+                        STDERR.puts "Error - #{e} \n\n"
+                    else
+                        errors = "One or more the json documents could not be parsed. Run jgrep -v for to display documents"
+                    end
                 end
             end
+
+            unless errors == ""
+                puts errors
+            end
+
             return result
 
         rescue JSON::ParserError => e
             STDERR.puts "Error. Invalid JSON given"
             exit 1
         end
+
     end
 
     #Correctly format values so we can do the correct type of comparison
@@ -52,6 +74,9 @@ module JGrep
 
         key.split(".").each_with_index do |item,i|
             tmp = tmp[item]
+            if tmp.nil?
+                return false
+            end
             result = false
             if tmp.is_a? Array
                 return (is_object_in_array?(tmp, "#{key.split(".")[i+1]}#{op}#{value}"))
@@ -105,6 +130,9 @@ module JGrep
 
         field.split(".").each_with_index do |item, i|
             tmp = tmp[item]
+            if tmp.nil?
+                return false
+            end
             if tmp.is_a? Array
                 tmp.each do |doc|
                     result = []
@@ -121,7 +149,6 @@ module JGrep
                                 left = token[1].split(op[0]).first.split(".").last
                                 right = token[1].split(op[0]).last
                                 new_statement = left + op[0] + right
-#                                new_statement = token[1].split(/<=|>=|=|<|>/).first.split(".").last + token[1].split(/<=|>=|=|<|>/).last
                                 result << has_object?(doc, new_statement)
                         end
                     end
