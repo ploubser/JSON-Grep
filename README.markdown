@@ -43,9 +43,9 @@
 
 ###JGrep Gem usage:###
 
-    `require 'jgrep'`
+    _require 'jgrep'_
 
-    `json = File.read("yourfile.json")`
-    `expression = "foo=1 or bar=1"`
+    _json = File.read("yourfile.json")_
+    _expression = "foo=1 or bar=1"_
 
-    `JGrep::jgrep(json, expression)`
+    _JGrep::jgrep(json, expression)_
