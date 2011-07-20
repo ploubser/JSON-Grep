@@ -1,29 +1,32 @@
-JGrep usage:    jgrep "foo.bar=1" foo.json
-             or
-                cat "foo.json" | jgrep "foo.bar=1"
+###Installation:###
 
-Installation:
+    gem install jgrep
 
-gem install jgrep
+###JGrep binary usage:###
 
-Flags:
+    jgrep "foo.bar=1" foo.json
+        or
+    cat "foo.json" | jgrep "foo.bar=1"
+
+###Flags:###
     -s [document field] : Greps the json and only returns the value of the field specified
     -f                  : Display ugly json
 
-Statements:
+###Statements:###
+
     A statement is defined as some value in a json document compared to another value.
     Available comparison operators are '=', '<', '>', '<=', '>='
 
     Example: foo.bar=1
 
-Complex statements:
+###Complex statements:###
 
     Statements can be combined to form logical sentences. Order of precedence can be set with '(' and ')'
     Available logical operaters are 'and', 'or', '!'.
 
     Example: !(foo.bar=1) and (foo=bar)
 
-In document comparison:
+###In document comparison:###
 
     If a document contains an array, the '[' and ']' operators can be used to define a comparison where
     statements are checked for truth on a per element basis.
@@ -36,4 +39,13 @@ In document comparison:
 
     {foo:[bar1:1,bar2:2]}
 
-Note: In document comparison cannot be nested.
+**Note**: In document comparison cannot be nested.
+
+###JGrep Gem usage:###
+
+    `require 'jgrep'`
+
+    `json = File.read("yourfile.json")`
+    `expression = "foo=1 or bar=1"`
+
+    `JGrep::jgrep(json, expression)`
