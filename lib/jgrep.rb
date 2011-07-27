@@ -4,7 +4,6 @@ require 'parser/parser.rb'
 require 'parser/scanner.rb'
 require 'rubygems'
 require 'json'
-require 'pp'
 
 module JGrep
     @verbose = false
@@ -86,16 +85,16 @@ module JGrep
         tmp, value = format(tmp, value.gsub(/"|'/, ""))
 
         case op
-        when "="
-            (tmp == value) ? (return true) : (return false)
-        when "<="
-            (tmp <= value) ? (return true) : (return false)
-        when ">="
-            (tmp >= value) ? (return true) : (return false)
-        when ">"
-            (tmp > value) ? (return true) : (return false)
-        when "<"
-            (tmp < value) ? (return true) : (return false)
+            when "="
+                (tmp == value) ? (return true) : (return false)
+            when "<="
+                (tmp <= value) ? (return true) : (return false)
+            when ">="
+                (tmp >= value) ? (return true) : (return false)
+            when ">"
+                (tmp > value) ? (return true) : (return false)
+            when "<"
+                (tmp < value) ? (return true) : (return false)
         end
     end
 
@@ -110,7 +109,6 @@ module JGrep
 
         return false
     end
-
 
     #Check if complex statement (defined as [key=value...]) is
     #present over an array of key value pairs

@@ -31,7 +31,7 @@ begin
     end
 
     #Load json from standard in if tty is false
-    #else find and load file from command lin arugments
+    #else find and load file from command line arugments
     unless STDIN.tty?
         json = STDIN.read
     else

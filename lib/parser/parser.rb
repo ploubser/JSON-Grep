@@ -67,6 +67,11 @@ module JGrep
                                 parse(c_token_value, 0)
                             end
 
+                            if c_token_value =~ /!=/
+                                c_token_value = c_token_value.gsub("!=", "=")
+                                @execution_stack << {"not", "not"}
+                            end
+
                             unless n_token =~ /and|or|\)/
                                 unless n_token.nil?
                                     raise "Error at column #{scanner.token_index}. \nExpected 'and', 'or', ')'. Found '#{n_token_value}'"
