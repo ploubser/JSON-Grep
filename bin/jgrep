@@ -7,12 +7,18 @@ options = {:flat => false}
 
 OptionParser.new do |opts|
     opts.banner = "Usage: jgrep [options] \"expression\""
-    opts.on("-s", "--simple FIELD", "Display a single field from each of the resulting json documents") do |field|
-        options[:field] = field
+    opts.on("-s", "--simple FIELD[s]", "Display a single field from each of the resulting json documents") do |field|
+        if (field.split(" ")).size > 1
+            options[:field] = field.split(" ")
+        else
+            options[:field] = field
+        end
     end
+
     opts.on("-f", "--flat", "Display non pretty json") do
         options[:flat] = true
     end
+
     opts.on("-v", "--verbose", "Verbose output") do
         JGrep::verbose_on
     end
@@ -30,7 +36,7 @@ begin
         end
     end
 
-    #Load json from standard in if tty is false
+    #Load json from standard input if tty is false
     #else find and load file from command line arugments
     unless STDIN.tty?
         json = STDIN.read
@@ -47,23 +53,19 @@ begin
         unless result == []
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
         end
+
     else
-        if options[:field] =~ /=|<|>/
-            raise "'-s' flag requires a field to display"
-        end
+        if options[:field].is_a? Array
+            JGrep::validate_filters(options[:field])
+            puts(JSON.pretty_generate(JGrep::jgrep((json), expression, options[:field])))
 
-        result = JGrep::jgrep((json), expression)
-
-        result.each do |r|
-            options[:field].split(".").each do |node|
-                unless r.is_a? Array
-                    r = r[node]
-                else
-                    break
-                end
-            end
-            unless r.nil?
-                (!r.is_a?(Array) && !r.is_a?(Hash)) ? puts(r) : puts(JSON.pretty_generate(r))
+        else
+            JGrep::validate_filters(options[:field])
+            result = JGrep::jgrep((json), expression, options[:field])
+            unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
+                result.map{|x| puts x unless x.nil?}
+            else
+                puts(JSON.pretty_generate(result))
             end
         end
     end

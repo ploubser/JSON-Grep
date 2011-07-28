@@ -22,7 +22,6 @@ module JGrep
                 result = JGrep::jgrep("[{\"bar\":1}]", "foo=1")
                 result.should == []
             end
-
         end
 
         describe "#format" do
@@ -110,6 +109,71 @@ module JGrep
             it "should return false if if document doesn't match logical expression" do
                 result = JGrep::eval_statement({"foo" => 1, "bar" => 1}, [{"statement" => "foo=0"}, {"and" => "and"}, {"statement" => "bar=1"}])
                 result.should == false
+            end
+        end
+
+        describe "#filter_json" do
+            it "should return the correct values if there is a single filter" do
+                result = JGrep::filter_json([{"foo" => 1, "bar" => 1}], "foo")
+                result.should == [1]
+            end
+
+            it "should return the correct values if there are multiple filters" do
+                result = JGrep::filter_json([{"foo" => 1, "foo1" => 1, "foo2" => 1}], ["foo2", "foo1"])
+                result.should == [[{"foo2"=>1}, {"foo1"=>1}]]
+            end
+
+            it "should return an empty set if the filter has not been found and there is only 1 filter" do
+                result = JGrep::filter_json([{"foo" => 1}], "bar")
+                result.should == []
+            end
+
+            it "should not return a structure containing a key if that key is not specified in the document" do
+                result = JGrep::filter_json([{"foo" => 1}], ["foo", "bar"])
+                result.should == [[{"foo" => 1}]]
+            end
+        end
+
+        describe "#validate_filters" do
+
+            it "should validate correct single filter" do
+                result = JGrep::validate_filters("foo")
+                result.should be_nil
+            end
+
+            it "should not validate if a single filter contains an invalid field" do
+                expect{
+                    result = JGrep::validate_filters("and")
+                }.to raise_error "Invalid field for -s filter : 'and'"
+            end
+
+            it "should correctly validate an array of filters" do
+                result = JGrep::validate_filters(["foo", "bar"])
+                result.should be_nil
+            end
+
+            it "should not validate if an array of filters contain an illegal filter" do
+                expect{
+                    result = JGrep::validate_filters(["foo", "or"])
+                }.to raise_error "Invalid field for -s filter : 'or'"
+            end
+        end
+
+        describe "#dig_path" do
+
+            it "should return the correct key value for a hash" do
+                result = JGrep::dig_path({"foo" => 1}, "foo")
+                result.should == 1
+            end
+
+            it "should return the correct value for any value that is not a hash or an array" do
+                result = JGrep::dig_path(1, "foo")
+                result.should == 1
+            end
+
+            it "should return the correct value for a subvalue in an array" do
+                result = JGrep::dig_path([{"foo" => 1}, {"foo" => 2}], "foo")
+                result.should == [1,2]
             end
         end
     end

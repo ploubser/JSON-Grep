@@ -13,7 +13,7 @@ module JGrep
     end
 
     #Method parses json and returns documents that match the logical expression
-    def self.jgrep(json, expression)
+    def self.jgrep(json, expression, filters = nil)
         errors = ""
         begin
             call_stack = Parser.new(expression).execution_stack
@@ -38,13 +38,63 @@ module JGrep
                 puts errors
             end
 
-            return result
+            unless filters
+                return result
+            else
+                filter_json(result, filters)
+            end
 
         rescue JSON::ParserError => e
             STDERR.puts "Error. Invalid JSON given"
             exit 1
         end
 
+    end
+
+    #Strips filters from json documents and returns those values as a less bloated json document
+    def self.filter_json(documents, filters)
+        result = []
+
+        if filters.is_a? Array
+            documents.each do |doc|
+                tmp_json = []
+                filters.each do |filter|
+                    filtered_result = dig_path(doc, filter)
+                    unless (filtered_result == doc) || filtered_result.nil?
+                        tmp_json << {filter => filtered_result}
+                    end
+                end
+                result << tmp_json
+            end
+
+            return result
+
+        else
+            documents.each do |r|
+                filtered_result = dig_path(r, filters)
+                unless (filtered_result == r) || filtered_result.nil?
+                    result << filtered_result
+                end
+            end
+
+            return result
+        end
+    end
+
+    #Validates if filters do not match any of the parser's logical tokens
+    def self.validate_filters(filters)
+        if filters.is_a? Array
+            filters.each do |filter|
+                if filter =~ /=|<|>|^and$|^or$|^!$|^not$/
+                    raise "Invalid field for -s filter : '#{filter}'"
+                end
+            end
+        else
+            if filters =~ /=|<|>|^and$|^or$|^!$|^not$/
+                raise "Invalid field for -s filter : '#{filters}'"
+            end
+        end
+        return
     end
 
     #Correctly format values so we can do the correct type of comparison
@@ -184,5 +234,42 @@ module JGrep
         end
 
         return eval(result.join(" "))
+    end
+
+    def self.dig_path(json, path)
+
+        json = json[path.split(".").first] if json.is_a? Hash
+
+        if json.is_a?(Hash)
+            if path == path.split(".").first
+                return json
+            else
+                return dig_path(json, (path.match(/\./) ? path.split(".").drop(1).join(".") : path))
+            end
+
+        elsif json.is_a? Array
+            if path == path.split(".").first && !(json.first.keys.include?(path))
+                return json
+            else
+                tmp = []
+                json.each do |j|
+                    tmp_path = dig_path(j, (path.match(/\./) ? path.split(".").drop(1).join(".") : path))
+                    unless tmp_path.nil?
+                        tmp << tmp_path
+                    end
+                end
+                unless tmp.empty?
+                    return tmp
+                end
+            end
+
+        elsif json.nil?
+            return nil
+
+        else
+            return json
+
+        end
+
     end
 end
