@@ -2,15 +2,20 @@ JGrep is a command line tool and API for parsing JSON documents based on logical
 
 ###Installation:###
 
+jgrep is available as a gem:
+
     gem install jgrep
 
 ###JGrep binary usage:###
 
     jgrep [expression] -i foo.json
-        or
+
+or
+
     cat "foo.json" | jgrep [expression]
 
 ###Flags:###
+
     -s "[Document fields]"  : Greps the JSON and only returns the value of the field(s) specified
     -c                      : Returns the JSON in its non-pretty flat form
     -f                      : Flatten the results as much as possible
@@ -55,79 +60,89 @@ JGrep uses the following logical symbols to define expressions.
 
 ###Statements:###
 
-    A statement is defined as some value in a json document compared to another value.
-    Available comparison operators are '=', '<', '>', '<=', '>='
+A statement is defined as some value in a json document compared to another value.
+Available comparison operators are '=', '<', '>', '<=', '>='
 
-    Examples:   foo.bar=1
-                foo.bar>0
-                foo.bar<=1.3
+Examples:   
+
+    foo.bar=1
+    foo.bar>0
+    foo.bar<=1.3
 
 ###Complex expressions:###
-    Given a json document, {"foo":1, "bar":null}, the following are examples of valid expressions
 
-    Examples:   +foo
-                - returns true
+Given a json document, {"foo":1, "bar":null}, the following are examples of valid expressions
 
-                -bar
-                - returns false
+Examples:   
 
-                +foo and !(foo=2)
-                - returns true
+    +foo
 
-                !(foo>=2 and bar=null) or !(bar=null)
-                - returns true
+... returns true
+
+    -bar
+
+... returns false
+
+    +foo and !(foo=2)
+
+... returns true
+
+    !(foo>=2 and bar=null) or !(bar=null)
+
+... returns true
 
 ###CLI missing an expression###
-    If JGrep is executed without a set expression, it will return an unmodified JSON document. The
-    -s flag can still be applied to the result.
+
+If JGrep is executed without a set expression, it will return an unmodified JSON document. The
+-s flag can still be applied to the result.
 
 ###In document comparison:###
 
-    If a document contains an array, the '[' and ']' operators can be used to define a comparison where
-    statements are checked for truth on a per element basis which will then be combined.
+If a document contains an array, the '[' and ']' operators can be used to define a comparison where
+statements are checked for truth on a per element basis which will then be combined.
 
-    Example: [foo.bar1=1 and foo.bar2=2]
+Example: 
 
-    on
+    [foo.bar1=1 and foo.bar2=2]
+
+on
 
     [
-        {
-            "foo":  [
-                        {
-                            "bar1":1
-                        },
-
-                        {
-                            "bar2":2
-                        }
-                    ],
-        },
-
-        {
-            "foo":  [
-                        {
-                            "bar1":0
-                        },
-                        {
-                            "bar2":0
-                        }
-                    ]
-        }
+      {
+        "foo":  [
+          {
+            "bar1":1
+          },
+          {
+            "bar2":2
+          }
+        ],
+      },
+      {
+        "foo":  [
+          {
+            "bar1":0
+          },
+          {
+            "bar2":0
+          }
+        ]
+      }
     ]
 
-    will return
+will return
 
     [
-        {
-            "foo": [
-                        {
-                            "bar1": 1
-                        },
-                        {
-                            "bar2": 2
-                        }
-                    ]
-        }
+      {
+        "foo": [
+          {
+            "bar1": 1
+          },
+          {
+            "bar2": 2
+          }
+        ]
+      }
     ]
 
 
@@ -135,41 +150,40 @@ JGrep uses the following logical symbols to define expressions.
 
 ###The -s flag###
 
-    The s flag simplifies the output returned by JGrep. Given a JSON document
+The s flag simplifies the output returned by JGrep. Given a JSON document
 
-        [{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]
+    [{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]
 
-    a JGrep invocation like
+a JGrep invocation like
 
-        cat my.json | jgrep "a=1" -s b
+    cat my.json | jgrep "a=1" -s b
 
-    will output
+will output
 
     1
 
-    The s flag can also be used with multiple field, which will return JSON as output which only contain the specified fields.
+The s flag can also be used with multiple field, which will return JSON as output which only contain the specified fields.
 
-    Given
+Given:
 
-        [{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]
+    [{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]
 
-    a JGrep invocation like
+a JGrep invocation like
 
-        cat my.json | jgrep "a>0" -s "a c"
+    cat my.json | jgrep "a>0" -s "a c"
 
-    will output
+will output
 
-        [
-            {
-                "a" : 1,
-                "c" : 3
-            },
-
-            {
-                "a" : 3,
-                "c" : 1
-            }
-        ]
+    [
+      {
+        "a" : 1,
+        "c" : 3
+      },
+      {
+        "a" : 3,
+        "c" : 1
+      }
+    ]
 
 ###JGrep Gem usage:###
 
