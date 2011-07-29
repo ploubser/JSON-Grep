@@ -60,6 +60,18 @@ module JGrep
                     token = scanner.get_token
                 }.to raise_error("Class name cannot be 'and', 'or', 'not'. Found 'and'")
             end
+
+            it "should identify a '+' token" do
+                scanner = Scanner.new("+foo")
+                token = scanner.get_token
+                token.should == ["+","foo"]
+            end
+
+            it "should identify a '-' token" do
+                scanner = Scanner.new("-foo")
+                token = scanner.get_token
+                token.should == ["-", "foo"]
+            end
         end
     end
 end

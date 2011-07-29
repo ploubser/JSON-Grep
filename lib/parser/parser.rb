@@ -33,7 +33,7 @@ module JGrep
                     case c_token
 
                         when "and"
-                            unless (n_token =~ /not|statement|\(/) || (scanner.token_index == scanner.arguments.size)
+                            unless (n_token =~ /not|statement|\(|\+|-/) || (scanner.token_index == scanner.arguments.size)
                                 raise "Error at column #{scanner.token_index}. \nExpected 'not', 'statement' or '('. Found '#{n_token_value}'"
                             end
 
@@ -44,7 +44,7 @@ module JGrep
                             end
 
                         when "or"
-                            unless (n_token =~ /not|statement|\(/) || (scanner.token_index == scanner.arguments.size)
+                            unless (n_token =~ /not|statement|\(|\+|-/) || (scanner.token_index == scanner.arguments.size)
                                 raise "Error at column #{scanner.token_index}. \nExpected 'not', 'statement', '('. Found '#{n_token_value}'"
                             end
 
@@ -55,7 +55,7 @@ module JGrep
                             end
 
                         when "not"
-                            unless n_token =~ /statement|\(|not/
+                            unless n_token =~ /statement|\(|not|\+|-/
                                 raise "Error at column #{scanner.token_index}. \nExpected 'statement' or '('. Found '#{n_token_value}'"
                             end
 
@@ -78,6 +78,21 @@ module JGrep
                                 end
                             end
 
+                        when "+"
+                            unless n_token =~ /and|or|\)/
+                                unless n_token.nil?
+                                    raise "Error at column #{scanner.token_index}. \nExpected 'and', 'or', ')'. Found '#{n_token_value}'"
+                                end
+                            end
+
+                        when "-"
+                            unless n_token =~ /and|or|\)/
+                                unless n_token.nil?
+                                    raise "Error at column #{scanner.token_index}. \nExpected 'and', 'or', ')'. Found '#{n_token_value}'"
+                                end
+                            end
+
+
                         when ")"
                             unless (n_token =~ /|and|or|not|\(/)
                                 unless n_token.nil?
@@ -87,7 +102,7 @@ module JGrep
                             parenth += 1
 
                         when "("
-                            unless n_token =~ /statement|not|\(/
+                            unless n_token =~ /statement|not|\(|\+|-/
                                 raise "Error at column #{scanner.token_index}. \nExpected 'statement', '(',  not. Found '#{n_token_value}'"
                             end
                             parenth -= 1

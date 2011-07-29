@@ -35,6 +35,16 @@ module JGrep
                 parser.execution_stack.should == [{"not" => "not"}, {"statement" =>"foo.bar=1"}]
             end
 
+            it "should parse a + token" do
+                parser = Parser.new("+foo")
+                parser.execution_stack.should == [{"+" => "foo"}]
+            end
+
+            it "should parse a - token" do
+                parser = Parser.new("-foo")
+                parser.execution_stack.should == [{"-" => "foo"}]
+            end
+
             it "should parse a correct 'and' token" do
                 parser = Parser.new("foo.bar=123 and bar.foo=321")
                 parser.execution_stack.should == [{"statement" => "foo.bar=123"}, {"and" => "and"}, {"statement" => "bar.foo=321"}]

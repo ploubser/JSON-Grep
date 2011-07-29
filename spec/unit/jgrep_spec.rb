@@ -27,6 +27,16 @@ module JGrep
                 result = JGrep::jgrep("[{\"foo\":null}]", "foo=null")
                 result.should == [{"foo" => nil}]
             end
+
+            it "should return the origional json document if no expression is given" do
+                result = JGrep::jgrep("[{\"foo\":\"bar\"}]", "")
+                result.should == [{"foo" => "bar"}]
+            end
+
+            it "should filter on the origional json document if not expression is given and a filter is given" do
+                result = JGrep::jgrep("[{\"foo\":\"bar\"}]", "", "foo")
+                result.should == ["bar"]
+            end
         end
 
         describe "#format" do

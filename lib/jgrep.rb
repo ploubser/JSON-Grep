@@ -7,32 +7,46 @@ require 'json'
 
 module JGrep
     @verbose = false
+    @flatten = false
 
     def self.verbose_on
         @verbose = true
+    end
+
+    def self.flatten_on
+        @flatten = true
     end
 
     #Method parses json and returns documents that match the logical expression
     def self.jgrep(json, expression, filters = nil)
         errors = ""
         begin
-            call_stack = Parser.new(expression).execution_stack
-            result = []
+            JSON.create_id = nil
             json = JSON.parse(json)
-            json.each do |document|
-                begin
-                    if eval_statement(document, call_stack)
-                        result << document
-                    end
-                rescue Exception => e
-                    if @verbose
-                        require 'pp'
-                        pp document
-                        STDERR.puts "Error - #{e} \n\n"
-                    else
-                        errors = "One or more the json documents could not be parsed. Run jgrep -v for to display documents"
+            if json.is_a? Hash
+                json = [json]
+            end
+            result = []
+            unless expression == ""
+                call_stack = Parser.new(expression).execution_stack
+
+                json.each do |document|
+                    begin
+                        if eval_statement(document, call_stack)
+                            result << document
+                        end
+                    rescue Exception => e
+                        if @verbose
+                            require 'pp'
+                            pp document
+                            STDERR.puts "Error - #{e} \n\n"
+                        else
+                            errors = "One or more the json documents could not be parsed. Run jgrep -v for to display documents"
+                        end
                     end
                 end
+            else
+                result = json
             end
 
             unless errors == ""
@@ -68,6 +82,7 @@ module JGrep
                 result << tmp_json
             end
 
+            result = result.flatten if (result.size == 1 && @flatten == true)
             return result
 
         else
@@ -78,6 +93,7 @@ module JGrep
                 end
             end
 
+            result = result.flatten if (result.size == 1 && @flatten == true)
             return result
         end
     end
@@ -107,6 +123,34 @@ module JGrep
         else
             return kvalue, value
         end
+    end
+
+    def self.present?(document, statement)
+        statement.split(".").each do |key|
+            if document.is_a? Hash
+                if document.has_value? nil
+                    document.each do |k, v|
+                        if document[k] == nil
+                            document[k] = "null"
+                        end
+                    end
+                end
+            end
+
+            if document.is_a? Array
+                rval = false
+                document.each do |doc|
+                    rval ||= present?(doc, key)
+                end
+                return rval
+            end
+
+            document = document[key]
+            if document.nil?
+                return false
+            end
+        end
+        return true
     end
 
     #Check if key=value is present in document
@@ -225,6 +269,10 @@ module JGrep
                 else
                     result << has_object?(document, expression.values.first)
                 end
+            when "+"
+                result << present?(document, expression.values.first)
+            when "-"
+                result << !(present?(document, expression.values.first))
             when "and"
                 result << "&&"
             when "or"
@@ -253,7 +301,7 @@ module JGrep
             end
 
         elsif json.is_a? Array
-            if path == path.split(".").first && !(json.first.keys.include?(path))
+            if path == path.split(".").first && (json.first.is_a?(Hash) && !(json.first.keys.include?(path)))
                 return json
             else
                 tmp = []

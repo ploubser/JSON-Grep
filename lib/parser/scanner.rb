@@ -54,6 +54,31 @@ module JGrep
                             gen_statement
                         end
 
+                    when "+"
+                        value = ""
+                        i = @token_index + 1
+
+                        begin
+                            value +=  @arguments.split("")[i]
+                            i += 1
+                        end until (i >= @arguments.size)  || (@arguments.split("")[i] =~ /\s|\)/)
+
+                        @token_index = i - 1
+                        return "+", value
+
+                    when "-"
+                        value = ""
+                        i = @token_index + 1
+
+                        begin
+                            value +=  @arguments.split("")[i]
+                            i += 1
+                        end until (i >= @arguments.size)  || (@arguments.split("")[i] =~ /\s|\)/)
+
+                        @token_index = i - 1
+                        return "-", value
+
+
                     when " "
                         return " ", " "
 

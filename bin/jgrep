@@ -5,44 +5,59 @@ require 'optparse'
 
 options = {:flat => false}
 
-OptionParser.new do |opts|
-    opts.banner = "Usage: jgrep [options] \"expression\""
-    opts.on("-s", "--simple FIELD[s]", "Display a single field from each of the resulting json documents") do |field|
-        if (field.split(" ")).size > 1
-            options[:field] = field.split(" ")
-        else
-            options[:field] = field
+begin
+    OptionParser.new do |opts|
+        opts.banner = "Usage: jgrep [options] \"expression\""
+        opts.on("-s", "--simple FIELD[s]", "Display a single field from each of the resulting json documents") do |field|
+            if (field.split(" ")).size > 1
+                options[:field] = field.split(" ")
+            else
+                options[:field] = field
+            end
         end
-    end
 
-    opts.on("-f", "--flat", "Display non pretty json") do
-        options[:flat] = true
-    end
+        opts.on("-c", "--compact", "Display non pretty json") do
+            options[:flat] = true
+        end
 
-    opts.on("-v", "--verbose", "Verbose output") do
-        JGrep::verbose_on
-    end
+        opts.on("-f", "--flatten", "Makes output as flat as possible") do
+            JGrep::flatten_on
+        end
 
-end.parse!
+        opts.on("-i", "--input [FILENAME]", "Specify input file tot parse") do |filename|
+            options[:file] = filename
+        end
+
+        opts.on("-v", "--verbose", "Verbose output") do
+            JGrep::verbose_on
+        end
+
+    end.parse!
+rescue OptionParser::InvalidOption => e
+    puts e.to_s.capitalize
+    exit 1
+end
 
 begin
     expression = nil
 
     #Identify the expression from command line arguments
     ARGV.each do |argument|
-        if argument =~ /<|>|=/
+        if argument =~ /<|>|=|\+|-/
             expression = argument
             ARGV.delete(argument)
         end
     end
+
+    expression = "" if expression.nil?
 
     #Load json from standard input if tty is false
     #else find and load file from command line arugments
     unless STDIN.tty?
         json = STDIN.read
     else
-        if ARGV.size == 1
-            json = File.read(ARGV.first)
+        if options[:file]
+            json = File.read(options[:file])
         else
             raise "No json input specified"
         end
