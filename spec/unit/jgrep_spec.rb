@@ -22,6 +22,11 @@ module JGrep
                 result = JGrep::jgrep("[{\"bar\":1}]", "foo=1")
                 result.should == []
             end
+
+            it "should correctly return 'null' if a null value is present in the document" do
+                result = JGrep::jgrep("[{\"foo\":null}]", "foo=null")
+                result.should == [{"foo" => nil}]
+            end
         end
 
         describe "#format" do
@@ -120,7 +125,7 @@ module JGrep
 
             it "should return the correct values if there are multiple filters" do
                 result = JGrep::filter_json([{"foo" => 1, "foo1" => 1, "foo2" => 1}], ["foo2", "foo1"])
-                result.should == [[{"foo2"=>1}, {"foo1"=>1}]]
+                result.should == [{"foo2"=>1, "foo1"=>1}]
             end
 
             it "should return an empty set if the filter has not been found and there is only 1 filter" do
@@ -130,7 +135,7 @@ module JGrep
 
             it "should not return a structure containing a key if that key is not specified in the document" do
                 result = JGrep::filter_json([{"foo" => 1}], ["foo", "bar"])
-                result.should == [[{"foo" => 1}]]
+                result.should == [{"foo" => 1}]
             end
         end
 

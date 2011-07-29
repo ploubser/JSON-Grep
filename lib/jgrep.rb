@@ -26,6 +26,7 @@ module JGrep
                     end
                 rescue Exception => e
                     if @verbose
+                        require 'pp'
                         pp document
                         STDERR.puts "Error - #{e} \n\n"
                     else
@@ -57,11 +58,11 @@ module JGrep
 
         if filters.is_a? Array
             documents.each do |doc|
-                tmp_json = []
+                tmp_json = {}
                 filters.each do |filter|
                     filtered_result = dig_path(doc, filter)
                     unless (filtered_result == doc) || filtered_result.nil?
-                        tmp_json << {filter => filtered_result}
+                        tmp_json[filter] = filtered_result
                     end
                 end
                 result << tmp_json
@@ -124,7 +125,11 @@ module JGrep
         key.split(".").each_with_index do |item,i|
             tmp = tmp[item]
             if tmp.nil?
-                return false
+                if item == key.split(".").last
+                    tmp = "null"
+                else
+                    return false
+                end
             end
             result = false
             if tmp.is_a? Array
@@ -132,7 +137,7 @@ module JGrep
             end
         end
 
-        tmp, value = format(tmp, value.gsub(/"|'/, ""))
+        tmp, value = format(tmp, (value.gsub(/"|'/, "") unless value.nil?))
 
         case op
             when "="
