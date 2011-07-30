@@ -21,6 +21,7 @@ or
     -f                      : Flatten the results as much as possible
     -v                      : Verbose output that will list a document if it fails to parse
     -i [FILENAME]           : Target JSON file to use as input
+    --start FIELD           : Starts the grep at a specific key in the document
 
 ###Expressions###
 
@@ -63,7 +64,7 @@ JGrep uses the following logical symbols to define expressions.
 A statement is defined as some value in a json document compared to another value.
 Available comparison operators are '=', '<', '>', '<=', '>='
 
-Examples:   
+Examples:
 
     foo.bar=1
     foo.bar>0
@@ -73,7 +74,7 @@ Examples:
 
 Given a json document, {"foo":1, "bar":null}, the following are examples of valid expressions
 
-Examples:   
+Examples:
 
     +foo
 
@@ -101,7 +102,7 @@ If JGrep is executed without a set expression, it will return an unmodified JSON
 If a document contains an array, the '[' and ']' operators can be used to define a comparison where
 statements are checked for truth on a per element basis which will then be combined.
 
-Example: 
+Example:
 
     [foo.bar1=1 and foo.bar2=2]
 
@@ -184,6 +185,27 @@ will output
         "c" : 1
       }
     ]
+
+###The --start flag###
+
+Some documents do not comply to our expected format, they might have an array embedded deep in a field.  The --start
+flag lets you pick a starting point for the grep.
+
+An example document can be seen here:
+
+    {"results": [
+                  {"name":"Jack", "surname":"Smith"},
+                  {"name":"Jill", "surname":"Jones"}
+                ]
+    }
+
+This document does not comply to our standard but does contain data that can be searched - the _results_ field.
+We can use the --start flat to tell jgrep to start looking for data in that field:
+
+<pre>
+$ cat my.json | jgrep --start results name=Jack -s surname
+Smith
+</pre>
 
 ###JGrep Gem usage:###
 
