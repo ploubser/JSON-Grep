@@ -3,7 +3,7 @@
 require 'jgrep'
 require 'optparse'
 
-options = {:flat => false}
+options = {:flat => false, :start => nil}
 
 begin
     OptionParser.new do |opts|
@@ -24,7 +24,7 @@ begin
             JGrep::flatten_on
         end
 
-        opts.on("-i", "--input [FILENAME]", "Specify input file tot parse") do |filename|
+        opts.on("-i", "--input [FILENAME]", "Specify input file to parse") do |filename|
             options[:file] = filename
         end
 
@@ -32,6 +32,9 @@ begin
             JGrep::verbose_on
         end
 
+        opts.on("--start [FIELD]", "Where in the data to start from") do |field|
+            options[:start] = field
+        end
     end.parse!
 rescue OptionParser::InvalidOption => e
     puts e.to_s.capitalize
@@ -64,7 +67,7 @@ begin
     end
 
     unless options[:field]
-        result = JGrep::jgrep((json), expression)
+        result = JGrep::jgrep((json), expression, nil, options[:start])
         unless result == []
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
         end
@@ -72,11 +75,11 @@ begin
     else
         if options[:field].is_a? Array
             JGrep::validate_filters(options[:field])
-            puts(JSON.pretty_generate(JGrep::jgrep((json), expression, options[:field])))
+            puts(JSON.pretty_generate(JGrep::jgrep((json), expression, options[:field], options[:start])))
 
         else
             JGrep::validate_filters(options[:field])
-            result = JGrep::jgrep((json), expression, options[:field])
+            result = JGrep::jgrep((json), expression, options[:field], options[:start])
             unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
                 result.map{|x| puts x unless x.nil?}
             else
