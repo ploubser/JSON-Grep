@@ -37,6 +37,20 @@ module JGrep
                 result = JGrep::jgrep("[{\"foo\":\"bar\"}]", "", "foo")
                 result.should == ["bar"]
             end
+
+            it "should support starting from a subdocument" do
+                doc = %q(
+                        {"results": [
+                                {"foo":"bar"},
+                                {"foo":"baz"}
+                                ]
+                        }
+                )
+
+                JGrep.verbose_on
+                results = JGrep::jgrep(doc, "foo=bar", nil, "results")
+                results.should == [{"foo"=>"bar"}]
+            end
         end
 
         describe "#format" do

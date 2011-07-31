@@ -18,7 +18,7 @@ module JGrep
     end
 
     #Method parses json and returns documents that match the logical expression
-    def self.jgrep(json, expression, filters = nil)
+    def self.jgrep(json, expression, filters = nil, start = nil)
         errors = ""
         begin
             JSON.create_id = nil
@@ -26,6 +26,9 @@ module JGrep
             if json.is_a? Hash
                 json = [json]
             end
+
+            json = filter_json(json, start).flatten if start
+
             result = []
             unless expression == ""
                 call_stack = Parser.new(expression).execution_stack
