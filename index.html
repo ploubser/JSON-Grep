@@ -49,12 +49,12 @@
     </div>
 
     <h2>Install</h2>
-        <p><pre><code>gem install jgrep</code></pre></p>
+        <p><pre><code>$ gem install jgrep</code></pre></p>
 
     <h2>JGrep on the CLI</h2>
     <p> JGrep can be invoked by either piping data to it
     <pre><code>cat foo.json | jgrep [expression]</code></pre>
-    or by using the i flag to specify an input file
+    or by using the i flag to specify an input file.
     <pre><code>jgrep [expression] -i foo.json</code></pre>
     </p>
 
@@ -114,7 +114,7 @@
 
     <p>
     <b>Statements</b><br><br>
-    A statement is defined as some value in a json document compared to another value. Available comparison operators are '=', '<', '>', '<=', '>=', '!='
+    A statement is defined as some value in a json document compared to another value. Available comparison operators are '=', '<', '>', '<=', '>=', '!='.
 
     <pre><code>
     foo.bar=1
@@ -127,7 +127,7 @@
     <p>
     <b>Complex expressions</b><br><br>
 
-    Given a json document, {"foo":1, "bar":null}, the following are examples of valid expressions
+    Given a json document, {"foo":1, "bar":null}, the following are examples of valid expressions.
 
     <pre><code>+foo</code></pre>
     ... returns true
@@ -206,7 +206,7 @@
 <pre><code>[{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]</code></pre>
 
     the JGrep invocation
-<pre><code>cat my.json | jgrep "a=1" -s b</code></pre>
+<pre><code>$ cat my.json | jgrep "a=1" -s b</code></pre>
     will ouput
 <pre><code>1</code></pre>
 
@@ -215,6 +215,10 @@ The s flag can also be used with multiple field, which will return JSON as outpu
 Given
 
 <pre><code>[{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]</code></pre>
+
+the JGrep invocation
+
+<pre><code>$ cat my.json | jgrep "a>0" -s "a c"</code></pre>
 will output
 <pre><code>
 [
@@ -292,10 +296,6 @@ JGrep::jgrep(json, expression, sflags)
       by running:
       <pre>$ git clone git://github.com/psy1337/JSON-Grep</pre>
     </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/psy1337/JSON-Grep">psy1337/JSON-Grep</a>
-    </div>
 
   </div>
 
