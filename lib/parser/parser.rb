@@ -69,7 +69,7 @@ module JGrep
 
                             if c_token_value =~ /!=/
                                 c_token_value = c_token_value.gsub("!=", "=")
-                                @execution_stack << {"not", "not"}
+                                @execution_stack << {"not" => "not"}
                             end
 
                             unless n_token =~ /and|or|\)/
