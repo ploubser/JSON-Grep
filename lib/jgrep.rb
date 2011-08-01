@@ -186,6 +186,14 @@ module JGrep
 
         tmp, value = format(tmp, (value.gsub(/"|'/, "") unless value.nil?))
 
+        if value.match(/^\/.*\/$/)
+            if tmp.match(Regexp.new(value.gsub("/", "")))
+                return true
+            else
+                return false
+            end
+        end
+
         case op
             when "="
                 (tmp == value) ? (return true) : (return false)
