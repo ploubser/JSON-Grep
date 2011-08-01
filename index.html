@@ -53,9 +53,9 @@
 
     <h2>JGrep on the CLI</h2>
     <p> JGrep can be invoked by either piping data to it
-    <pre><code>cat foo.json | jgrep [expression]</code></pre>
+    <pre><code>$ cat foo.json | jgrep [expression]</code></pre>
     or by using the i flag to specify an input file.
-    <pre><code>jgrep [expression] -i foo.json</code></pre>
+    <pre><code>$ jgrep [expression] -i foo.json</code></pre>
     </p>
 
     <p> <b>Flags</b>
@@ -248,7 +248,7 @@ An example document can be seen here:
 }
 </code></pre>
 
-This document does not comply to our standard but does contain data that can be searched - the results field. We can use the --start flat to tell jgrep to start looking for data in that field:
+This document does not comply to our standard, but does contain data that can be searched - the results field. We can use the --start flat to tell jgrep to start looking for data in that field:
 
 <pre><code>
 $ cat my.json | jgrep --start results name=Jack -s surname
