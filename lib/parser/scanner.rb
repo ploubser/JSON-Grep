@@ -46,12 +46,24 @@ module JGrep
                             gen_statement
                         end
 
+                    when "&"
+                        if(@arguments.split("")[@token_index +1] == "&")
+                            @token_index += 1
+                            return "and", "and"
+                        end
+
                     when "o"
                         if (@arguments.split("")[@token_index + 1] == "r") && ((@arguments.split("")[@token_index + 2] == " ") || (@arguments.split("")[@token_index + 2] == "("))
                             @token_index += 1
                             return "or", "or"
                         else
                             gen_statement
+                        end
+
+                    when "|"
+                        if(@arguments.split("")[@token_index +1] == "|")
+                            @token_index += 1
+                            return "or", "or"
                         end
 
                     when "+"

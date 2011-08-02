@@ -302,6 +302,9 @@ module JGrep
 
     def self.dig_path(json, path)
 
+        puts path
+        exit!
+
         json = json[path.split(".").first] if json.is_a? Hash
 
         if json.is_a?(Hash)
