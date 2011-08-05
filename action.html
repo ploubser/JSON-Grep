@@ -2,7 +2,7 @@
 
     <h3>Real world examples</h3>
 
-    <p><b> Using MCollective to check if a file is present on a box and output its name:</b>
+    <p><b>Using MCollective to check if a file is present on a host and outputs the name of the host:</b>
 
     <pre><code>
     $ mco rpc filemgr status file=/.../check_puppet.rb -j |
@@ -11,7 +11,7 @@
     </code></pre></p>
 
     <p>
-    <b>Checking the total size of a logfile across mutiple web servers:</b>
+    <b>Checking the total size of a log file across mutiple hosts:</b>
     <pre><code>
     $ mco rpc filemgr status file=/var/log/httpd/access_log -W /apache/ -j |
         jgrep -s "data.size"|
@@ -29,7 +29,7 @@
     </code></pre>
     </p>
 
-    <p><b>Interacting with twitter:</b>
+    <p><b>Interacting with Twitter:</b>
     <pre><code>
     $ curl -s "http://search.twitter.com/search.json?q=sysadminday"|
             jgrep --start results -s "text"

@@ -1,8 +1,8 @@
 <div id="container">
     <center><h2>JGrep on the CLI</h2></center>
-        <p> JGrep can be invoked by either piping data to it
+        <p> JGrep can be invoked by piping data to it:
         <pre><code>$ cat foo.json | jgrep [expression]</code></pre>
-        or by using the i flag to specify an input file.
+        Or by using the <code>i</code> flag to specify an input file.
         <pre><code>$ jgrep [expression] -i foo.json</code></pre>
         </p>
 
@@ -45,12 +45,12 @@
     '+' :
         - +[value]
 
-        Returns true if value is present in the json document
+        Returns true if value is present in the JSON document
 
     '-' :
         - -[value]
 
-        Returns true if value is not present in the json doument
+        Returns true if value is not present in the JSON doument
 
 '(' and ')' :
         - (expression1) and expression2
@@ -62,7 +62,7 @@
 
     <p>
     <b>Statements</b><br><br>
-    A statement is defined as some value in a json document compared to another value. Available comparison operators are '=', '<', '>', '<=', '>=', '!='.
+    A statement is defined as some value in a JSON document that is compared to another value. Available comparison operators are '=', '<', '>', '<=', '>=', '!='.
 
     Example :
 
@@ -77,7 +77,7 @@
     <p>
     <b>Complex expressions</b><br><br>
 
-    Given a json document, {"foo":1, "bar":null}, the following are valid expressions:
+    Given a JSON document, {"foo":1, "bar":null}, the following are valid expressions:
 
     <pre><code>+foo</code></pre>
     ... returns true
@@ -92,7 +92,7 @@
 
     <p>
     <b>JGrep without expressions</b><br><br>
-    If JGrep is executed without a set expression, it will return an unmodified JSON document. The -s flag can still be applied to the result.
+    If JGrep is executed without a set expression, it will return an unmodified JSON document. The <code>-s</code> flag can still be applied to the result.
     </p>
 
     <p>
@@ -152,7 +152,7 @@
     <p>
     <b>The -s flag</b><br><br>
 
-    The -s flag simplifies the output returned by JGrep. Given a JSON document:
+    The <code>-s</code> flag simplifies the output returned by JGrep. Given a JSON document:
 
 <pre><code>[{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]</code></pre>
 
@@ -161,7 +161,7 @@
     will ouput:
 <pre><code>1</code></pre>
 
-The -s flag can also be used with multiple fields, which will return JSON as output that only contain the specified fields.
+    The <code>-s</code> flag can also be used with multiple fields, which will return JSON as output that only contain the specified fields.
 
 Given:
 
@@ -187,7 +187,7 @@ will output:
 
 <p>
 <b>The -start flag</b><br><br>
-Some documents do not comply with our expected format, they might have an array embedded deep in a field. The --start flag lets you pick a starting point for the grep.
+Some documents do not comply with our expected format, they might have an array embedded deep in a field. The <code>--start</code> flag lets you pick a starting point for the grep.
 
 A sample document can be seen here:
 
@@ -199,7 +199,7 @@ A sample document can be seen here:
 }
 </code></pre>
 
-This document does not comply with our standard, but does contain data that can be searched - the results field. We can use the --start flag to tell jgrep to start looking for data in that field:
+This document does not comply with our standard, but does contain data that can be searched - the results field. We can use the <code>--start</code> flag to tell jgrep to start looking for data in that field:
 
 <pre><code>
 $ cat my.json | jgrep --start results name=Jack -s surname
