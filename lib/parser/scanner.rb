@@ -48,8 +48,10 @@ module JGrep
 
                     when "&"
                         if(@arguments.split("")[@token_index +1] == "&")
-                            @token_index += 1
+                            @token_index +=1
                             return "and", "and"
+                        else
+                            gen_statement
                         end
 
                     when "o"
@@ -62,8 +64,10 @@ module JGrep
 
                     when "|"
                         if(@arguments.split("")[@token_index +1] == "|")
-                            @token_index += 1
+                            @token_index +=1
                             return "or", "or"
+                        else
+                            gen_statement
                         end
 
                     when "+"

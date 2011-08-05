@@ -100,6 +100,11 @@ module JGrep
                 result = JGrep::has_object?({"foo"=> 1}, "foo>0")
                 result.should == true
             end
+
+            it "should compare based on regular expression" do
+                result = JGrep::has_object?({"foo"=> "bar"}, "foo=/ba/")
+                result.should == true
+            end
         end
 
         describe "#is_object_in_array?" do
@@ -203,6 +208,18 @@ module JGrep
             it "should return the correct value for a subvalue in an array" do
                 result = JGrep::dig_path([{"foo" => 1}, {"foo" => 2}], "foo")
                 result.should == [1,2]
+            end
+
+            it "should return the correct value if a wildcard is specified" do
+                result = JGrep::dig_path([{"foo" => {"bar" => 1}}], "foo.*")
+                result.should == [[{"bar"=>1}]]
+            end
+
+            it "should return the correct value if the path contains a dot seperated key" do
+                result = JGrep::dig_path({"foo.bar" => 1}, "foo.bar")
+                result.should == 1
+                result = JGrep::dig_path({"foo" => {"foo.bar" =>1}}, "foo.foo.bar")
+                result.should == 1
             end
         end
     end

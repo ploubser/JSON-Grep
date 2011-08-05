@@ -4,6 +4,7 @@ require 'parser/parser.rb'
 require 'parser/scanner.rb'
 require 'rubygems'
 require 'json'
+#require 'yajl/json_gem'
 
 module JGrep
     @verbose = false
@@ -17,7 +18,10 @@ module JGrep
         @flatten = true
     end
 
-    #Method parses json and returns documents that match the logical expression
+    #Parse json and return documents that match the logical expression
+    #Filters define output by limiting it to only returning a the listed keys.
+    #Start allows you to move the pointer indicating where parsing starts.
+    #Default is the first key in the document heirarchy
     def self.jgrep(json, expression, filters = nil, start = nil)
         errors = ""
         begin
@@ -66,6 +70,78 @@ module JGrep
             STDERR.puts "Error. Invalid JSON given"
             exit 1
         end
+    end
+
+    #Convert a specific hash inside a JSON document to an array
+    #Mark is a string in the format foo.bar.baz that points to
+    #the array in the document.
+    def self.hash_to_array(documents, mark)
+
+        begin
+            documents = JSON.parse(documents)
+        rescue JSON::ParserError => e
+            STDERR.puts "Error. Invalid JSON given"
+            exit 1
+        end
+
+        result = []
+
+        begin
+            for i in 0..(documents.size - 1) do
+                tmp = documents[i]
+                unless mark == ""
+                    mark.split(".").each_with_index do |m,i|
+                        tmp = tmp[m] unless i == mark.split(".").size - 1
+                    end
+                end
+
+                tmp[mark.split.last].each{|d| result << {"value" => d[1], "key" => d[0]}}
+                tmp[mark.split.last] = result
+
+            end
+        rescue Exception => e
+            STDERR.puts "Error. Invalid position specified in JSON document"
+            exit!
+        end
+
+        puts JSON.pretty_generate(documents)
+
+    end
+
+    #Convert a specific array inside a JSON document to a hash
+    #Mark is a string in the format foo.bar.baz that points to
+    #the hash in the document. Each element in the array will
+    #be turned into a hash in the format key => array[x]
+    def self.array_to_hash(documents, mark, key)
+
+        begin
+            documents = JSON.parse(documents)
+        rescue JSON::ParserError => e
+            STDERR.puts "Error. Invalid JSON given"
+            exit 1
+        end
+
+        result = {}
+
+        begin
+            for i in 0..(documents.size - 1) do
+                tmp = documents[i]
+                unless mark == ""
+                    mark.split(".").each_with_index do |m,i|
+                        tmp = tmp[m] unless i == mark.split(".").size - 1
+                    end
+                end
+
+                tmp[mark.split(".").last].each{|d| result[d[key]] = d}
+                tmp[mark.split(".").last] = result
+
+            end
+        rescue Exception => e
+            STDERR.puts "Error. Invalid position specified in JSON document"
+            exit!
+        end
+
+        puts JSON.pretty_generate(documents)
 
     end
 
@@ -128,6 +204,8 @@ module JGrep
         end
     end
 
+
+    #Check if the json key that is defined by statement is defined in the json document
     def self.present?(document, statement)
         statement.split(".").each do |key|
             if document.is_a? Hash
@@ -167,33 +245,25 @@ module JGrep
             op = statement
         end
 
-        tmp = document
+        tmp = dig_path(document, key)
 
-        key.split(".").each_with_index do |item,i|
-            tmp = tmp[item]
-            if tmp.nil?
-                if item == key.split(".").last
-                    tmp = "null"
-                else
-                    return false
-                end
-            end
-            result = false
-            if tmp.is_a? Array
-                return (is_object_in_array?(tmp, "#{key.split(".")[i+1]}#{op}#{value}"))
-            end
+        if tmp.is_a?(Array) and tmp.size == 1
+            tmp = tmp.first
         end
 
         tmp, value = format(tmp, (value.gsub(/"|'/, "") unless value.nil?))
 
-        if value.match(/^\/.*\/$/)
-            if tmp.match(Regexp.new(value.gsub("/", "")))
-                return true
-            else
-                return false
-            end
+        #Deal with null comparison
+        if tmp.nil? and value == "null"
+            return true
         end
 
+        #Deal with regex matching
+        if ((value =~ /^\/.*\/$/) && tmp != nil)
+            (tmp.match(Regexp.new(value.gsub("/", "")))) ? (return true) : (return false)
+        end
+
+        #Deal with everything else
         case op
             when "="
                 (tmp == value) ? (return true) : (return false)
@@ -300,27 +370,50 @@ module JGrep
         return eval(result.join(" "))
     end
 
+    #Digs to a specific path in the json document and returns the value
     def self.dig_path(json, path)
 
-        puts path
-        exit!
+        path = path.gsub(/^\./, "")
 
-        json = json[path.split(".").first] if json.is_a? Hash
+        if path == ""
+            return json
+        end
 
-        if json.is_a?(Hash)
-            if path == path.split(".").first
+        if json.is_a? Hash
+            json.keys.each do |k|
+                if path.match(/^#{k}/) && k.match(/\./)
+                    return dig_path(json[k], path.gsub(k, ""))
+                end
+            end
+        end
+
+        path_array=path.split(".")
+
+        if path_array.first == "*"
+            tmp = []
+            json.each do |j|
+                tmp << dig_path(j[1], path_array.drop(1).join("."))
+            end
+            return tmp
+
+        end
+
+        json = json[path_array.first] if json.is_a? Hash
+
+        if json.is_a? Hash
+            if path == path_array.first
                 return json
             else
-                return dig_path(json, (path.match(/\./) ? path.split(".").drop(1).join(".") : path))
+                return dig_path(json, (path.match(/\./) ? path_array.drop(1).join(".") : path))
             end
 
         elsif json.is_a? Array
-            if path == path.split(".").first && (json.first.is_a?(Hash) && !(json.first.keys.include?(path)))
+            if path == path_array.first && (json.first.is_a?(Hash) && !(json.first.keys.include?(path)))
                 return json
             else
                 tmp = []
                 json.each do |j|
-                    tmp_path = dig_path(j, (path.match(/\./) ? path.split(".").drop(1).join(".") : path))
+                    tmp_path = dig_path(j, (path.match(/\./) ? path_array.drop(1).join(".") : path))
                     unless tmp_path.nil?
                         tmp << tmp_path
                     end

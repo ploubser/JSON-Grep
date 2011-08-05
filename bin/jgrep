@@ -8,7 +8,7 @@ options = {:flat => false, :start => nil}
 begin
     OptionParser.new do |opts|
         opts.banner = "Usage: jgrep [options] \"expression\""
-        opts.on("-s", "--simple FIELD[s]", "Display a single field from each of the resulting json documents") do |field|
+        opts.on("-s", "--simple [FIELDS]", "Display only one or more fields from each of the resulting json documents") do |field|
             if (field.split(" ")).size > 1
                 options[:field] = field.split(" ")
             else
@@ -87,6 +87,7 @@ begin
             end
         end
     end
+
 rescue Exception => e
     STDERR.puts "Error - #{e}"
     exit 1
