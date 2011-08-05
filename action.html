@@ -1,5 +1,49 @@
 <div id="container">
 
+    <h3>Real world examples</h3>
+
+    <p><b> Using MCollective to check if a file is present on a box and output its name:</b>
+
+    <pre><code>
+    $ mco rpc filemgr status file=/.../check_puppet.rb -j |
+        jgrep 'data.md5!=a4fdf7a8cc756d0455357b37501c24b5' -s sender
+    box1.example.com
+    </code></pre></p>
+
+    <p>
+    <b>Checking the total size of a logfile across mutiple web servers:</b>
+    <pre><code>
+    $ mco rpc filemgr status file=/var/log/httpd/access_log -W /apache/ -j |
+        jgrep -s "data.size"|
+        awk '{ SUM += $1} END { print SUM/1024/1024 " MB"}'
+    2757.9093 MB
+    </code></pre>
+    </p>
+
+    <p>
+    <b>Interacting with the GitHub API:</b>
+    <pre><code>
+    $ curl -s http://github.com/api/v2/json/commits/list/puppetlabs/marionette-collective/master|
+            jgrep --start commits "author.name='Pieter Loubser'" -s id
+    52470fee0b9fe14fb63aeb344099d0c74eaf7513
+    </code></pre>
+    </p>
+
+    <p><b>Interacting with twitter:</b>
+    <pre><code>
+    $ curl -s "http://search.twitter.com/search.json?q=sysadminday"|
+            jgrep --start results -s "text"
+
+    RT @RedHat_Training: Did you know that today is Systems Admin Day?  A big THANK YOU to all our system admins!  Here's to you!  http://t.co/ZQk8ifl
+    RT @SinnerBOFH: #BOFHers RT @linuxfoundation: Happy #SysAdmin Day! You know who you are, rock stars. http://t.co/kR0dhhc #linux
+    RT @google: Hey, sysadmins - thanks for all you do. May your pagers be silent and your users be clueful today! http://t.co/N2XzFgw
+    RT @google: Hey, sysadmins - thanks for all you do. May your pagers be silent and your users be clueful today! http://t.co/y9TbCqb #sysadminday
+    RT @mfujiwara: http://www.sysadminday.com/
+    RT @mitchjoel: It's SysAdmin Day! Have you hugged your SysAdmin today? Make sure all employees follow the rules: http://bit.ly/17m98z #humor
+    ? @mfujiwara: http://www.sysadminday.com/
+    </code></pre>
+    </p>
+
     <h3>Blogs</h3><br/>
     <ul>
         <li>Blog post by <a href="http://www.devco.net">R.I.Pienaar</a> showing off JGrep - <a href=http://www.devco.net/archives/2011/07/29/rich-data-on-the-cli.php>www.devco.net</a></li>
