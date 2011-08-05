@@ -47,6 +47,7 @@ $(document).ready(function()
                 success: function(html){
                     $("#container").replaceWith(html);
                     window.location.href = "#" + e.currentTarget.id.replace("menu-", "");
+                    $(document.body).scrollTop(0);
 
                 }
             });
