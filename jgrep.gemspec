@@ -1,10 +1,11 @@
 Gem::Specification.new do |s|
     s.name = "jgrep"
-    s.version = "1.2.1"
+    s.version = "1.3.0"
 
     s.authors = ["P Loubser"]
-    s.date = %q{2011-08-01}
+    s.date = %q{2011-08-05}
     s.default_executable = "jgrep"
+    s.add_dependency('json')
     s.description = "Compare a list of json documents to a simple logical language and returns matches as output"
     s.email = ["ploubser@gmail.com"]
     s.executables = ["jgrep"]

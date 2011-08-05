@@ -2,6 +2,7 @@
 
 require File.dirname(__FILE__) + "/../spec_helper"
 
+
 module JGrep
     describe Scanner do
         describe '#get_token' do
@@ -23,10 +24,23 @@ module JGrep
                 token.should == ["and", "and"]
             end
 
+            it "should identify a '&&' token" do
+                scanner = Scanner.new("&& ")
+                token = scanner.get_token
+                token.should == ["and", "and"]
+            end
+
             it "should identify an 'or' token" do
                 scanner = Scanner.new("or ")
                 token = scanner.get_token
                 token.should == ["or", "or"]
+            end
+
+            it "should identify a "||" token" do
+                scanner = Scanner.new("|| ")
+                token = scanner.get_token
+                token.should == ["or", "or"]
+
             end
 
             it "should identify an 'not' token" do
