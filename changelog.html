@@ -1,0 +1,87 @@
+<div id="container">
+
+
+    <center><h2>Version 1.3.0</h2></center>
+    <h3>Features:</h3>
+    <p>The -s flag now supports wild cards on keys:
+    <pre><code>
+    {
+     "status": "OK",
+     "data": {
+       "baz.bar.com": {
+         "classes": [
+           "base"
+         ],
+         "roles": [
+           "baserole"
+         ],
+         "parameters": {
+           "time_server": "time.stanford.edu"
+         }
+       },
+
+       "foo.bar.com": {
+         "classes": [
+           "base"
+         ],
+         "roles": [
+           "baserole"
+         ],
+         "parameters": {
+           "time_server": "time.mit.edu"
+         }
+       }
+     }
+    }
+
+    % jgrep -s data.*.parameters.time_server
+
+    time.mit.edu
+    time.standford.edu
+    </code></pre></p>
+
+    <p>Regular expressions can now be used in matcher expressions:
+    <pre><code>
+    % jgrep data.foo.bar.com.parameters.time_server=/time/
+    [
+        {
+            "data": {
+                "foo.bar.com": {
+                    "parameters": {
+                        "time_server": "time.mit.edu"
+                    },
+    ...
+    </code></pre></p>
+
+    <p>'And' and 'or' can now be replaced with '&amp;&amp;' and '||':
+
+    <pre><code>
+    % jgrep "data.foo.bar.com.parameters.time_server=/time/ && status=OK"
+    [
+        {
+            "data": {
+                "foo.bar.com": {
+                    "parameters": {
+                        "time_server": "time.mit.edu"
+                    },
+    ...
+
+    % jgrep "data.foo.bar.com.parameters.time_server=/time/ || status=NOTOK"
+    [
+        {
+            "data": {
+                "foo.bar.com": {
+                    "parameters": {
+                        "time_server": "time.mit.edu"
+                    },
+    ...
+
+
+    </code></pre><br/>
+    <h3>Bug Fixes</h3>
+    <pre><code>
+    - JGrep now correctly identifies dot seperated keys as keys.
+    - JGrep is now correctly dependant on the JSON gem.
+    </code></pre>
+
+</div>
