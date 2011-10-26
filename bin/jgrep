@@ -28,6 +28,10 @@ begin
             options[:file] = filename
         end
 
+        opts.on("-q", "--quiet", "Quiet; don't write to stdout.  Exit with zero status if match found.") do
+            options[:quiet] = true
+        end
+
         opts.on("-v", "--verbose", "Verbose output") do
             JGrep::verbose_on
         end
@@ -68,27 +72,43 @@ begin
 
     unless options[:field]
         result = JGrep::jgrep((json), expression, nil, options[:start])
-        unless result == []
+        unless result == [] or options[:quiet] == true
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
         end
-
+        if result.length == 0
+            exit 1
+        end
     else
         if options[:field].is_a? Array
             JGrep::validate_filters(options[:field])
-            puts(JSON.pretty_generate(JGrep::jgrep((json), expression, options[:field], options[:start])))
+            result = JGrep::jgrep((json), expression, options[:field], options[:start])
+            unless result == [] or options[:quiet] == true
+                puts(JSON.pretty_generate(result))
+            end
 
         else
             JGrep::validate_filters(options[:field])
             result = JGrep::jgrep((json), expression, options[:field], options[:start])
             unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
-                result.map{|x| puts x unless x.nil?}
+                unless options[:quiet] == true
+                    result.map{|x| puts x unless x.nil?}
+                end
             else
-                puts(JSON.pretty_generate(result))
+                unless options[:quiet] == true
+                    puts(JSON.pretty_generate(result))
+                end
+            end
+            unless result.length > 0
+                exit 1
             end
         end
     end
 
 rescue Exception => e
-    STDERR.puts "Error - #{e}"
-    exit 1
+    if e.is_a?(SystemExit)
+        exit e.status
+    else
+        STDERR.puts "Error - #{e}"
+        exit 1
+    end
 end
