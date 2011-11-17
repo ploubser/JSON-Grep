@@ -3,21 +3,56 @@
 require 'jgrep'
 require 'optparse'
 
-options = {:flat => false, :start => nil}
+@options = {:flat => false, :start => nil}
+
+def do_grep(json, expression)
+    unless @options[:field]
+        result = JGrep::jgrep((json), expression, nil, @options[:start])
+        unless result == [] or @options[:quiet] == true
+            (@options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
+        end
+    else
+        if @options[:field].is_a? Array
+            JGrep::validate_filters(@options[:field])
+            result = JGrep::jgrep((json), expression, @options[:field], @options[:start])
+            unless result == [] or @options[:quiet] == true
+                puts(JSON.pretty_generate(result))
+            end
+
+        else
+            JGrep::validate_filters(@options[:field])
+            result = JGrep::jgrep((json), expression, @options[:field], @options[:start])
+            unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
+                unless @options[:quiet] == true
+                    result.map{|x| puts x unless x.nil?}
+                end
+            else
+                unless @options[:quiet] == true
+                    puts(JSON.pretty_generate(result))
+                end
+            end
+        end
+    end
+end
+
 
 begin
     OptionParser.new do |opts|
         opts.banner = "Usage: jgrep [options] \"expression\""
         opts.on("-s", "--simple [FIELDS]", "Display only one or more fields from each of the resulting json documents") do |field|
             if (field.split(" ")).size > 1
-                options[:field] = field.split(" ")
+                @options[:field] = field.split(" ")
             else
-                options[:field] = field
+                @options[:field] = field
             end
         end
 
         opts.on("-c", "--compact", "Display non pretty json") do
-            options[:flat] = true
+            @options[:flat] = true
+        end
+
+        opts.on("-n", "--stream", "Display continuous output from continuous input") do
+            @options[:stream] = true
         end
 
         opts.on("-f", "--flatten", "Makes output as flat as possible") do
@@ -25,11 +60,11 @@ begin
         end
 
         opts.on("-i", "--input [FILENAME]", "Specify input file to parse") do |filename|
-            options[:file] = filename
+            @options[:file] = filename
         end
 
         opts.on("-q", "--quiet", "Quiet; don't write to stdout.  Exit with zero status if match found.") do
-            options[:quiet] = true
+            @options[:quiet] = true
         end
 
         opts.on("-v", "--verbose", "Verbose output") do
@@ -37,7 +72,7 @@ begin
         end
 
         opts.on("--start [FIELD]", "Where in the data to start from") do |field|
-            options[:start] = field
+            @options[:start] = field
         end
     end.parse!
 rescue OptionParser::InvalidOption => e
@@ -58,52 +93,35 @@ begin
 
     expression = "" if expression.nil?
 
+    #Continuously gets if inputstream in constant
     #Load json from standard input if tty is false
     #else find and load file from command line arugments
-    unless STDIN.tty?
-        json = STDIN.read
-    else
-        if options[:file]
-            json = File.read(options[:file])
+
+    if @options[:stream]
+        unless STDIN.tty?
+            while json = gets
+                do_grep(json, expression)
+            end
         else
             raise "No json input specified"
         end
-    end
-
-    unless options[:field]
-        result = JGrep::jgrep((json), expression, nil, options[:start])
-        unless result == [] or options[:quiet] == true
-            (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
-        end
-        if result.length == 0
-            exit 1
-        end
     else
-        if options[:field].is_a? Array
-            JGrep::validate_filters(options[:field])
-            result = JGrep::jgrep((json), expression, options[:field], options[:start])
-            unless result == [] or options[:quiet] == true
-                puts(JSON.pretty_generate(result))
-            end
-
+        unless STDIN.tty?
+            json = STDIN.read
+            do_grep(json, expression)
         else
-            JGrep::validate_filters(options[:field])
-            result = JGrep::jgrep((json), expression, options[:field], options[:start])
-            unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
-                unless options[:quiet] == true
-                    result.map{|x| puts x unless x.nil?}
-                end
+            if @options[:file]
+                json = File.read(@options[:file])
+                do_grep(json, expression)
             else
-                unless options[:quiet] == true
-                    puts(JSON.pretty_generate(result))
-                end
-            end
-            unless result.length > 0
-                exit 1
+                raise "No json input specified"
             end
         end
     end
 
+rescue Interrupt
+    STDERR.puts "Exiting..."
+    exit 1
 rescue Exception => e
     if e.is_a?(SystemExit)
         exit e.status
