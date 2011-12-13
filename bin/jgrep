@@ -9,7 +9,15 @@ def do_grep(json, expression)
     unless @options[:field]
         result = JGrep::jgrep((json), expression, nil, @options[:start])
         unless result == [] or @options[:quiet] == true
-            (@options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
+            if @options[:flat] == false
+                puts(JSON.pretty_generate(result))
+            else
+                if @options[:stream]
+                    puts(result.first.to_json)
+                else
+                    puts(result.to_json)
+                end
+            end
         end
     else
         if @options[:field].is_a? Array
@@ -34,7 +42,6 @@ def do_grep(json, expression)
         end
     end
 end
-
 
 begin
     OptionParser.new do |opts|
