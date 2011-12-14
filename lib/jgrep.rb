@@ -4,11 +4,22 @@ require 'parser/parser.rb'
 require 'parser/scanner.rb'
 require 'rubygems'
 require 'json'
-#require 'yajl/json_gem'
 
 module JGrep
     @verbose = false
     @flatten = false
+
+    class JGrep
+        attr_accessor :json
+
+        def initialize(json)
+            @json = json
+        end
+
+        def match(expression)
+            return !::JGrep.jgrep(@json, expression).empty?
+        end
+    end
 
     def self.verbose_on
         @verbose = true
@@ -48,7 +59,7 @@ module JGrep
                             pp document
                             STDERR.puts "Error - #{e} \n\n"
                         else
-                            errors = "One or more the json documents could not be parsed. Run jgrep -v for to display documents"
+                            errors = "One or more the json documents could not be parsed. Run jgrep -v to display documents"
                         end
                     end
                 end
@@ -71,6 +82,7 @@ module JGrep
             exit 1
         end
     end
+
 
     #Convert a specific hash inside a JSON document to an array
     #Mark is a string in the format foo.bar.baz that points to

@@ -47,10 +47,14 @@ begin
     OptionParser.new do |opts|
         opts.banner = "Usage: jgrep [options] \"expression\""
         opts.on("-s", "--simple [FIELDS]", "Display only one or more fields from each of the resulting json documents") do |field|
-            if (field.split(" ")).size > 1
-                @options[:field] = field.split(" ")
+            unless field.nil?
+                if (field.split(" ")).size > 1
+                    @options[:field] = field.split(" ")
+                else
+                    @options[:field] = field
+                end
             else
-                @options[:field] = field
+                raise "-s flag requires a field value"
             end
         end
 
@@ -84,6 +88,10 @@ begin
     end.parse!
 rescue OptionParser::InvalidOption => e
     puts e.to_s.capitalize
+    exit 1
+
+rescue Exception => e
+    puts e
     exit 1
 end
 
