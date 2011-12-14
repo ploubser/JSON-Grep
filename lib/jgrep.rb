@@ -10,14 +10,19 @@ module JGrep
     @flatten = false
 
     class JGrep
-        attr_accessor :json
+        attr_accessor :value, :expression
 
-        def initialize(json)
-            @json = json
+        def initialize()
+            @value = ""
+            @expression = ""
         end
 
-        def match(expression)
-            return !::JGrep.jgrep(@json, expression).empty?
+        def match_expression(expression)
+            return !::JGrep.jgrep(@value, expression).empty?
+        end
+
+        def match_value(value)
+            return !::JGrep.jgrep(value, @expression).empty?
         end
     end
 
@@ -45,8 +50,6 @@ module JGrep
             if json.is_a? Hash
                 json = [json]
             end
-
-            pp json
 
             json = filter_json(json, start).flatten if start
 
