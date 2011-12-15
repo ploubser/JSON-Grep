@@ -23,6 +23,7 @@ or
     -i [FILENAME]           : Target JSON file to use as input
     --start FIELD           : Starts the grep at a specific key in the document
     -q                      : Quiet; don't write to stdout.  Exit with zero status if match found.
+    -n                      : Specify continuous input
 
 ###Expressions###
 
@@ -220,3 +221,15 @@ Smith
     sflags = "foo"
 
     JGrep::jgrep(json, expression, sflags)
+
+###JGrep class usage###
+
+    require 'jgrep'
+
+    a = JGrep::JGrep.new
+
+    a.expression = "foo=bar"
+    puts a.match_value('{"foo":"bar"}')
+
+    a.value = {"foo" => "bar"}
+    puts a.match_expression("foo=bar")
