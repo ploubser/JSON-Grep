@@ -5,26 +5,27 @@ require 'optparse'
 
 @options = {:flat => false, :start => nil}
 
+def print_json(result)
+    unless @options[:flat]
+        result = result.first if @options[:stream]
+        puts(JSON.pretty_generate(result))
+    else
+        puts(result.first.to_json)
+    end
+end
+
 def do_grep(json, expression)
     unless @options[:field]
         result = JGrep::jgrep((json), expression, nil, @options[:start])
         unless result == [] or @options[:quiet] == true
-            if @options[:flat] == false
-                puts(JSON.pretty_generate(result))
-            else
-                if @options[:stream]
-                    puts(result.first.to_json)
-                else
-                    puts(result.to_json)
-                end
-            end
+            print_json(result)
         end
     else
         if @options[:field].is_a? Array
             JGrep::validate_filters(@options[:field])
             result = JGrep::jgrep((json), expression, @options[:field], @options[:start])
             unless result == [] or @options[:quiet] == true
-                puts(JSON.pretty_generate(result))
+                print_json(result)
             end
 
         else
@@ -36,7 +37,7 @@ def do_grep(json, expression)
                 end
             else
                 unless @options[:quiet] == true
-                    puts(JSON.pretty_generate(result))
+                    print_json(result)
                 end
             end
         end

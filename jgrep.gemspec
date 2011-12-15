@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
     s.version = "1.3.1"
 
     s.authors = ["P Loubser"]
-    s.date = %q{2011-08-05}
+    s.date = %q{2011-12-15}
     s.default_executable = "jgrep"
     s.add_dependency('json')
     s.description = "Compare a list of json documents to a simple logical language and returns matches as output"
