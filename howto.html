@@ -1,0 +1,251 @@
+<div id="container">
+    <center><h2>JGrep on the CLI</h2></center>
+        <p> JGrep can be invoked by piping data to it:
+        <pre><code>$ cat foo.json | jgrep [expression]</code></pre>
+        Or by using the <code>i</code> flag to specify an input file.
+        <pre><code>$ jgrep [expression] -i foo.json</code></pre>
+        </p>
+
+        <p> <b>Flags</b>
+
+        <pre><code>
+-s "[Document fields]"  : Greps the JSON and only returns the value of field(s)
+                          specified
+-c                      : Returns the JSON in its non-pretty flat form
+-f                      : Flatten the results as much as possible
+-v                      : Verbose output that will list a document if it fails to
+                          parse
+-i [FILENAME]           : Target JSON file to use as input
+--start FIELD           : Starts the grep at a specific key in the document
+- n                     : Specify continuous input
+        </code></pre>
+    </p>
+
+    <p>
+    <b>Expressions</b><br><br>
+
+    JGrep uses the following logic symbols to define expressions:
+
+    <pre><code>
+    'and' :
+         - [statement] and [statement]
+
+        Evaluates to true if both statements are true
+
+    'or' :
+        - [statement] and [statement]
+
+         Evaluates true if either statement is true
+
+    'not' :
+        - ! [statement]
+        - not [statement]
+
+        Inverts the value of statement
+
+    '+' :
+        - +[value]
+
+        Returns true if value is present in the JSON document
+
+    '-' :
+        - -[value]
+
+        Returns true if value is not present in the JSON doument
+
+'(' and ')' :
+        - (expression1) and expression2
+
+        Performs the operations inside the perentheses first.
+
+    </code></pre>
+    </p>
+
+    <p>
+    <b>Statements</b><br><br>
+    A statement is defined as some value in a JSON document that is compared to another value. Available comparison operators are '=', '<', '>', '<=', '>=', '!='.
+
+    Example :
+
+    <pre><code>
+    foo.bar=1
+    foo.bar&lt;0
+    foo.bar&lt;=1.3
+    </code></pre>
+
+    </p>
+
+    <p>
+    <b>Complex expressions</b><br><br>
+
+    Given a JSON document, {"foo":1, "bar":null}, the following are valid expressions:
+
+    <pre><code>+foo</code></pre>
+    ... returns true
+    <pre><code>-foo</code></pre>
+    ... returns false
+    <pre><code>+foo and !(foo=2)</code></pre>
+    ... returns true
+    <pre><code>!(foo&gt;=2 and bar=null) or !(bar=null)</code></pre>
+    ... returns true
+    </p>
+
+
+    <p>
+    <b>JGrep without expressions</b><br><br>
+    If JGrep is executed without a set expression, it will return an unmodified JSON document. The <code>-s</code> flag can still be applied to the result.
+    </p>
+
+    <p>
+    <b>In-document comparison</b><br><br>
+    If a document contains an array, the '[' and ']' symbols can be used to define a comparison where statements are checked for truth on a per element basis which will then be combined.
+
+    Consider:
+
+    <pre><code>[foo.bar1=1 and foo.bar2=2]</code></pre>
+
+    on:
+    <pre><code>
+[
+  {
+    "foo":  [
+      {
+        "bar1":1
+      },
+      {
+        "bar2":2
+      }
+    ]
+  },
+  {
+    "foo":  [
+      {
+        "bar1":0
+      },
+      {
+        "bar2":0
+      }
+    ]
+  }
+]
+    </code></pre>
+
+    will return:
+
+    <pre><code>
+[
+  {
+    "foo": [
+      {
+        "bar1": 1
+      },
+      {
+        "bar2": 2
+      }
+    ]
+  }
+]
+    </code></pre>
+
+    <b>Note:</b> In-document comparison cannot be nested.
+    </p>
+
+    <p>
+    <b>The -s flag</b><br><br>
+
+    The <code>-s</code> flag simplifies the output returned by JGrep. Given a JSON document:
+
+<pre><code>[{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]</code></pre>
+
+    the JGrep invocation:
+<pre><code>$ cat my.json | jgrep "a=1" -s b</code></pre>
+    will ouput:
+<pre><code>1</code></pre>
+
+    The <code>-s</code> flag can also be used with multiple fields, which will return JSON as output that only contain the specified fields.
+
+Given:
+
+<pre><code>[{"a":1, "b":2, "c":3}, {"a":3, "b":2, "c":1}]</code></pre>
+
+the JGrep invocation:
+
+<pre><code>$ cat my.json | jgrep "a&gt;0" -s "a c"</code></pre>
+will output:
+<pre><code>
+[
+  {
+    "a" : 1,
+    "c" : 3
+  },
+  {
+    "a" : 3,
+    "c" : 1
+  }
+]
+</code></pre>
+    </p>
+
+<p>
+<b>The -start flag</b><br><br>
+Some documents do not comply with our expected format, they might have an array embedded deep in a field. The <code>--start</code> flag lets you pick a starting point for the grep.
+
+A sample document can be seen here:
+
+<pre><code>
+{"results": [
+              {"name":"Jack", "surname":"Smith"},
+              {"name":"Jill", "surname":"Jones"}
+            ]
+}
+</code></pre>
+
+This document does not comply with our standard, but does contain data that can be searched - the results field. We can use the <code>--start</code> flag to tell jgrep to start looking for data in that field:
+
+<pre><code>
+$ cat my.json | jgrep --start results name=Jack -s surname
+Smith
+</code></pre>
+</p>
+
+<p>
+<b>Continuous input</b><br><br>
+JGrep can be configured to parse continuous input by setting the <code>-n</code> flag.
+
+<pre><code>
+tail -f yourfile.json | jgrep -n "foo=bar"
+</code></pre>
+</p>
+
+<br><br><center><h2>JGrep in your code</h2></center>
+
+<p><pre><code>
+require 'jgrep'
+
+json = File.read("yourfile.json")
+expression = "foo=1 or bar=1"
+
+JGrep::jgrep(json, expression)
+
+sflags = "foo"
+
+JGrep::jgrep(json, expression, sflags)
+</code></pre>
+
+You can also create a JGrep object and set constant JSON values and expressions if you need to evaluate a single expression on a large set of input, or a range of expressions on a single JSON input.
+
+<pre><code>
+require 'jgrep'
+
+a = JGrep::JGrep.new
+
+a.expression = "foo=bar"
+puts a.match_value('{"foo":"bar"}')
+
+a.value = {"foo" => "bar"}
+puts a.match_expression("foo=bar")
+</code></pre>
+
+</p>
+
+</div>

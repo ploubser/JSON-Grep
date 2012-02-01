@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+
+  <title>jgrep.org</title>
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+  <script type="text/javascript" src="jgrep.js"></script>
+
+  <style type="text/css">
+    body {
+      margin-top: 1.0em;
+      font-family: Helvetica, Arial, FreeSans, san-serif;
+      color: #000000;
+    }
+    #container {
+      margin: 50px auto;
+      width: 700px;
+    }
+    #text-area {
+        margin: 0 auto;
+        width:700px;
+    }
+
+    h1 { font-size: 3.8em; margin-bottom: 3px; }
+    h1 .small { font-size: 0.3em; }
+    h1 a { text-decoration: none }
+    h2 { font-size: 1.5em;}
+    h3 { text-align: center; }
+    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    .download { float: right; }
+    pre { background: #000; color: #fff; padding: 15px;}
+    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+    .footer { text-align:center; padding-top:30px; font-style: italic; }
+    #menus { position:fixed;left:10px;top:100px;margin-top: 50px; background-color:#000000; width:200px; font-family: monospace;}
+    .menu-item {background-color:#000000; color:#ffffff; margin-top:5px; font-size:1.1em}
+    #head {margin: 0 auto; width: 700px;font-family: monospace}
+    #menus a {text-decoration: none; color:#ffffff}
+</style>
+</head>
+
+<body>
+
+    <div id="body-container">
+        <div id="menus">
+            <div class="menu-item" id="menu-home"><h3><a href="#home">Home</a></h3></div>
+            <div class="menu-item" id="menu-install"><h3><a href="#install">Install</a></h3></div>
+            <div class="menu-item" id="menu-changelog"><h3><a href="#changelog">Changelog</a></h3></div>
+            <div class="menu-item" id="menu-howto"><h3><a href="#howto">Howto</a></h3></div>
+            <div class="menu-item" id="menu-issues"><h3>Issues</h3></div>
+            <div class="menu-item" id="menu-action"><h3><a href="#action">JGrep in Action</a></h3></div>
+            <div class="menu-item" id="menu-documentation"><h3>API Documentation</h3></div>
+            <div class="menu-item" id="menu-authors"><h3><a href="#authors">Authors and Contributers</a></h3></div>
+        </div>
+
+        <a href="http://github.com/psy1337/JSON-Grep"><img style="position: fixed; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+        <center><div id="head"> <h1>JSON-Grep</h1></div></center>
+
+        <div id="container"></div>
+    </div>
+</body>
+</html>

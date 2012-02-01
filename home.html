@@ -1,0 +1,35 @@
+<div id="container">
+    <p>
+    JGrep is a Ruby-based CLI tool and API for parsing and displaying JSON data using a logical expression syntax.
+    </p>
+
+    <p>
+    JGrep allows you to search a list of JSON documents and return specific documents or values based on logical truths.
+
+    <pre><code>
+    $ cat my.json | jgrep "foo=hello and bar=world"
+
+    {
+        "foo": "hello",
+        "bar": "world"
+    }
+    </code></pre>
+    </p>
+
+    <p>
+    JGrep also allows you to display your JSON document in a simplified manner.
+
+    <pre><code>
+    $ cat my.json |jgrep -s foo
+
+    hello
+    </code></pre>
+
+    For more information on how Jgrep works, check out our <a href="#howto">howto</a> page.
+    </p>
+
+    <p>
+    JGrep is available under the Apache 2.0 License.
+    </p>
+
+</div>
