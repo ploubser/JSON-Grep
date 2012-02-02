@@ -102,22 +102,30 @@
 
     Consider:
 
-    <pre><code>[foo.bar1=1] and [foo.bar2=2]</code></pre>
+    <pre><code>[foo.bar1=1 and foo.bar2=2]</code></pre>
 
     on:
     <pre><code>
 [
   {
-    "foo":[
-        "bar1",
-        "bar2"
+    "foo":  [
+      {
+        "bar1":1
+      },
+      {
+        "bar2":2
+      }
     ]
   },
   {
-    "foo":[
-          "bar2",
-          "bar3"
-      ]
+    "foo":  [
+      {
+        "bar1":0
+      },
+      {
+        "bar2":0
+      }
+    ]
   }
 ]
     </code></pre>
