@@ -38,7 +38,7 @@ $(document).ready(function()
             $(location).attr("href", "http://rubydoc.info/gems/jgrep/1.3.0/frames")
         }
         else if(e.currentTarget.id == "menu-issues"){
-            $(location).attr("href", "https://github.com/psy1337/JSON-Grep/issues")
+            $(location).attr("href", "https://github.com/ploubser/JSON-Grep/issues")
         }
         else{
             $.ajax({
