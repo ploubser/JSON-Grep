@@ -371,8 +371,13 @@ module JGrep
 
     #Digs to a specific path in the json document and returns the value
     def self.dig_path(json, path)
-
+        index = nil
         path = path.gsub(/^\./, "")
+
+        if path =~ /(.*)\[(.*)\]/
+            path = $1
+            index = $2
+        end
 
         if path == ""
             return json
@@ -418,7 +423,7 @@ module JGrep
                     end
                 end
                 unless tmp.empty?
-                    return tmp
+                    (index) ? (return tmp.flatten[index.to_i]) : (return tmp)
                 end
             end
 
