@@ -9,11 +9,7 @@ begin
     OptionParser.new do |opts|
         opts.banner = "Usage: jgrep [options] \"expression\""
         opts.on("-s", "--simple [FIELDS]", "Display only one or more fields from each of the resulting json documents") do |field|
-            if (field.split(" ")).size > 1
-                options[:field] = field.split(" ")
-            else
-                options[:field] << field
-            end
+            options[:field].concat(field.split(" "))
         end
 
         opts.on("-c", "--compact", "Display non pretty json") do
