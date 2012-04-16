@@ -3,17 +3,13 @@
 require 'jgrep'
 require 'optparse'
 
-options = {:flat => false, :start => nil}
+options = {:flat => false, :start => nil, :field => []}
 
 begin
     OptionParser.new do |opts|
         opts.banner = "Usage: jgrep [options] \"expression\""
         opts.on("-s", "--simple [FIELDS]", "Display only one or more fields from each of the resulting json documents") do |field|
-            if (field.split(" ")).size > 1
-                options[:field] = field.split(" ")
-            else
-                options[:field] = field
-            end
+            options[:field].concat(field.split(" "))
         end
 
         opts.on("-c", "--compact", "Display non pretty json") do
@@ -70,7 +66,7 @@ begin
         end
     end
 
-    unless options[:field]
+    if options[:field].empty?
         result = JGrep::jgrep((json), expression, nil, options[:start])
         unless result == [] or options[:quiet] == true
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
@@ -79,7 +75,7 @@ begin
             exit 1
         end
     else
-        if options[:field].is_a? Array
+        if options[:field].size > 1
             JGrep::validate_filters(options[:field])
             result = JGrep::jgrep((json), expression, options[:field], options[:start])
             unless result == [] or options[:quiet] == true
@@ -87,8 +83,8 @@ begin
             end
 
         else
-            JGrep::validate_filters(options[:field])
-            result = JGrep::jgrep((json), expression, options[:field], options[:start])
+            JGrep::validate_filters(options[:field][0])
+            result = JGrep::jgrep((json), expression, options[:field][0], options[:start])
             unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
                 unless options[:quiet] == true
                     result.map{|x| puts x unless x.nil?}
