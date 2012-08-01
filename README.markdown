@@ -165,6 +165,7 @@ will output
     1
 
 The s flag can also be used with multiple field, which will return JSON as output which only contain the specified fields.
+**Note**: Separate fields by a space and enclose all fields in quotes (see example below) 
 
 Given:
 
