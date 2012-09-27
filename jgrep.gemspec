@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name = "jgrep"
-    s.version = "1.3.2"
+    s.version = "1.3.3"
 
     s.authors = ["P Loubser"]
     s.date = %q{2012-09-26}
