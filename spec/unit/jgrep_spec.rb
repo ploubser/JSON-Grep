@@ -13,9 +13,7 @@ module JGrep
 
             it "should fail on an invalid json document" do
                 STDERR.expects(:puts).with("Error. Invalid JSON given")
-                expect{
-                    result = JGrep::jgrep("[foo:]", "foo=1")
-                }.to raise_error("exit")
+                result = JGrep::jgrep("[foo:]", "foo=1")
             end
 
             it "should return '[]' if value is not present in document" do

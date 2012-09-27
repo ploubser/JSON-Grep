@@ -68,7 +68,6 @@ module JGrep
 
         rescue JSON::ParserError => e
             STDERR.puts "Error. Invalid JSON given"
-            exit 1
         end
     end
 
