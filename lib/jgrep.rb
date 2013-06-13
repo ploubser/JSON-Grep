@@ -258,6 +258,13 @@ module JGrep
             return true
         end
 
+        # Deal with booleans
+        if tmp == true and value == 'true'
+            return true
+        elsif tmp == false and value == 'false'
+            return true
+        end
+
         #Deal with regex matching
         if ((value =~ /^\/.*\/$/) && tmp != nil)
             (tmp.match(Regexp.new(value.gsub("/", "")))) ? (return true) : (return false)
