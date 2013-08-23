@@ -61,14 +61,12 @@ begin
 
     #Load json from standard input if tty is false
     #else find and load file from command line arugments
-    unless STDIN.tty?
+    if options[:file]
+        json = File.read(options[:file])
+    elsif ! STDIN.tty?
         json = STDIN.read
     else
-        if options[:file]
-            json = File.read(options[:file])
-        else
-            raise "No json input specified"
-        end
+        raise "No json input specified"
     end
 
     if options[:field].empty?
