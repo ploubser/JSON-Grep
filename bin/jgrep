@@ -3,7 +3,7 @@
 require 'jgrep'
 require 'optparse'
 
-options = {:flat => false, :start => nil, :field => []}
+options = {:flat => false, :start => nil, :field => [], :slice => nil}
 
 begin
     OptionParser.new do |opts|
@@ -35,6 +35,11 @@ begin
         opts.on("--start [FIELD]", "Where in the data to start from") do |field|
             options[:start] = field
         end
+
+        opts.on("--slice RANGE", "A range of the form 'n' or 'n..m', indicating which documents to extract from the final output") do |field|
+            range_nums = field.split('..').map{ |x| x.to_i }
+            options[:slice] = range_nums.length == 1 ? range_nums[0] : Range.new(*range_nums)
+        end
     end.parse!
 rescue OptionParser::InvalidOption => e
     puts e.to_s.capitalize
@@ -56,54 +61,47 @@ begin
 
     #Load json from standard input if tty is false
     #else find and load file from command line arugments
-    unless STDIN.tty?
+    if options[:file]
+        json = File.read(options[:file])
+    elsif ! STDIN.tty?
         json = STDIN.read
     else
-        if options[:file]
-            json = File.read(options[:file])
-        else
-            raise "No json input specified"
-        end
+        raise "No json input specified"
     end
 
     if options[:field].empty?
-        result = JGrep::jgrep((json), expression, nil, options[:start])
-        unless result == [] or options[:quiet] == true
-            (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
-        end
-        if result.length == 0
-            exit 1
-        end
+        fields = nil
+    elsif options[:field].size > 1
+        fields = options[:field]
     else
-        if options[:field].size > 1
-            JGrep::validate_filters(options[:field])
-            result = JGrep::jgrep((json), expression, options[:field], options[:start])
-            unless result == [] or options[:quiet] == true
-                puts(JSON.pretty_generate(result))
-            end
-
-        else
-            JGrep::validate_filters(options[:field][0])
-            result = JGrep::jgrep((json), expression, options[:field][0], options[:start])
-            unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
-                unless options[:quiet] == true
-                    result.map{|x| puts x unless x.nil?}
-                end
-            else
-                unless options[:quiet] == true
-                    puts(JSON.pretty_generate(result))
-                end
-            end
-            unless result.length > 0
-                exit 1
-            end
-        end
+        fields = options[:field][0]
     end
 
+    result = JGrep::jgrep((json), expression, fields, options[:start])
+
+    result = result.slice(options[:slice]) if options[:slice]
+
+    if result.nil? || result.empty?
+        exit 1
+    elsif ! options[:quiet] 
+        if ! fields 
+          if result.is_a?(Array) || result.is_a?(Hash)
+            final_result = options[:flat] ? result.to_json : JSON.pretty_generate(result)
+          else
+            final_result = result
+          end
+        elsif result.is_a?(Array) && ! (result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash))
+          final_result = result.select{ |x| ! x.nil? }.join("\n")
+        else
+          final_result = JSON.pretty_generate(result)
+        end
+        puts(final_result)
+    end
 rescue Exception => e
     if e.is_a?(SystemExit)
         exit e.status
     else
+        raise e
         STDERR.puts "Error - #{e}"
         exit 1
     end
