@@ -103,6 +103,20 @@ module JGrep
                 result = JGrep::has_object?({"foo"=> "bar"}, "foo=/ba/")
                 result.should == true
             end
+
+            it "should compare true booleans" do
+                result = JGrep::has_object?({"foo"=> true}, "foo=true")
+                result.should == true
+                result = JGrep::has_object?({"foo"=> false}, "foo=true")
+                result.should == false
+            end
+
+            it "should compare true booleans" do
+                result = JGrep::has_object?({"foo"=> false}, "foo=false")
+                result.should == true
+                result = JGrep::has_object?({"foo"=> true}, "foo=false")
+                result.should == false
+            end
         end
 
         describe "#is_object_in_array?" do
