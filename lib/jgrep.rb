@@ -385,7 +385,7 @@ module JGrep
 
         if json.is_a? Hash
             json.keys.each do |k|
-                if path.match(/^#{k}/) && k.match(/\./)
+                if path.start_with?(k) && k.include?('.')
                     return dig_path(json[k], path.gsub(k, ""))
                 end
             end
@@ -408,7 +408,7 @@ module JGrep
             if path == path_array.first
                 return json
             else
-                return dig_path(json, (path.match(/\./) ? path_array.drop(1).join(".") : path))
+                return dig_path(json, (path.include?('.') ? path_array.drop(1).join(".") : path))
             end
 
         elsif json.is_a? Array
@@ -417,7 +417,7 @@ module JGrep
             else
                 tmp = []
                 json.each do |j|
-                    tmp_path = dig_path(j, (path.match(/\./) ? path_array.drop(1).join(".") : path))
+                    tmp_path = dig_path(j, (path.include?('.') ? path_array.drop(1).join(".") : path))
                     unless tmp_path.nil?
                         tmp << tmp_path
                     end
