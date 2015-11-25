@@ -35,7 +35,7 @@ $(document).ready(function()
     $(".menu-item").click(function(e)
     {
         if(e.currentTarget.id == "menu-documentation"){
-            $(location).attr("href", "http://rubydoc.info/gems/jgrep/1.3.0/frames")
+            $(location).attr("href", "http://rubydoc.info/gems/jgrep/1.4.0/frames")
         }
         else if(e.currentTarget.id == "menu-issues"){
             $(location).attr("href", "https://github.com/ploubser/JSON-Grep/issues")
