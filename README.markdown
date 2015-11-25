@@ -16,14 +16,15 @@ or
 
 ###Flags:###
 
-    -s "[Document fields]"  : Greps the JSON and only returns the value of the field(s) specified
-    -c                      : Returns the JSON in its non-pretty flat form
-    -f                      : Flatten the results as much as possible
-    -v                      : Verbose output that will list a document if it fails to parse
-    -i [FILENAME]           : Target JSON file to use as input
-    --start FIELD           : Starts the grep at a specific key in the document
-    -q                      : Quiet; don't write to stdout.  Exit with zero status if match found.
-    -n                      : Specify continuous input
+    -s, --simple [FIELDS]   : Greps the JSON and only returns the value of the field(s) specified
+    -c, --compat            : Returns the JSON in its non-pretty flat form
+    -n, --stream            : Specify continuous input
+    -f, --flatten           : Flatten the results as much as possible
+    -i, --input [FILENAME]  : Target JSON file to use as input
+    -q, --quiet             : Quiet; don't write to stdout.  Exit with zero status if match found.
+    -v, --verbose           : Verbose output that will list a document if it fails to parse
+        --start FIELD       : Starts the grep at a specific key in the document
+        --slice [RANGE]     : A range of the form 'n' or 'n..m', indicating which documents to extract from the final output
 
 ###Expressions###
 
@@ -209,6 +210,25 @@ We can use the --start flat to tell jgrep to start looking for data in that fiel
 $ cat my.json | jgrep --start results name=Jack -s surname
 Smith
 </pre>
+
+### The --slice flag
+
+Allows the user to provide an int or range to slice an array of
+results with, in particular so a single element can be extracted, e.g.
+
+    $ echo '[{"foo": {"bar": "baz"}}, {"foo": {"bar":"baz"}}]' |
+        jgrep "foo.bar=baz" --slice 0
+    {
+      "foo": {
+        "bar": "baz"
+      }
+    }
+
+### The --stream flag
+
+With the --stream or -n flag, jgrep will process multiple JSON inputs (newline
+separated) until standard input is closed.  Each JSON input will be processed
+as usual, but the output immediately printed.
 
 ###JGrep Gem usage:###
 

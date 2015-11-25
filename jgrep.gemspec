@@ -1,17 +1,28 @@
+require 'date'
+
 Gem::Specification.new do |s|
     s.name = "jgrep"
-    s.version = "1.3.3"
 
-    s.authors = ["P Loubser"]
-    s.date = %q{2012-09-26}
-    s.default_executable = "jgrep"
-    s.add_dependency('json')
+    s.version = "1.4.0"
+    s.date = Date.today.to_s
+
+    s.summary = "Filter JSON documents with a simple logical language"
     s.description = "Compare a list of json documents to a simple logical language and returns matches as output"
-    s.email = ["ploubser@gmail.com"]
-    s.executables = ["jgrep"]
-    s.files = ["jgrep.gemspec", "bin/jgrep", Dir.glob("lib/*"), Dir.glob("lib/parser/*")].flatten
-    s.has_rdoc = true
-    s.homepage = "https://github.com/psy1337/JSON-Grep"
+    s.homepage = "https://github.com/ploubser/JSON-Grep"
+    s.license = "Apache-2.0"
+
+    s.authors = ["P Loubser", "Dominic Cleal"]
+    s.email = ["ploubser@gmail.com", "dominic@cleal.org"]
+
+    s.files = `git ls-files`.split("\n") - Dir[".*", "Gem*", "*.gemspec"]
+    s.extra_rdoc_files = [
+        "CHANGELOG.markdown",
+        "README.markdown",
+    ]
     s.require_paths = ["lib"]
-    s.summary = s.description
+    s.executables = ["jgrep"]
+    s.default_executable = "jgrep"
+    s.has_rdoc = true
+
+    s.add_dependency('json')
 end
