@@ -303,7 +303,7 @@ module JGrep
                 break
             end
         end
-        field = field[1].first.split(/=|<|>/).first
+        field = field[1].split(/=|<|>/).first
 
         field.split(".").each_with_index do |item, i|
             tmp = tmp[item]

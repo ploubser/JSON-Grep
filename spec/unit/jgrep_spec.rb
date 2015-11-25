@@ -138,6 +138,11 @@ module JGrep
                 result.should == true
             end
 
+            it "should return true if if document matches logical expression array" do
+                result = JGrep::eval_statement({"foo" => ["bar" => 1]}, [{"statement" => [["statement", "foo.bar=1"]]}] )
+                result.should == true
+            end
+
             it "should return false if if document doesn't match logical expression" do
                 result = JGrep::eval_statement({"foo" => 1, "bar" => 1}, [{"statement" => "foo=0"}, {"and" => "and"}, {"statement" => "bar=1"}])
                 result.should == false
