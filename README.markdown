@@ -23,6 +23,7 @@ or
     -i [FILENAME]           : Target JSON file to use as input
     --start FIELD           : Starts the grep at a specific key in the document
     -q                      : Quiet; don't write to stdout.  Exit with zero status if match found.
+    -n                      : Specify continuous input
 
 ###Expressions###
 
