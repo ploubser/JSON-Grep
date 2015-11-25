@@ -68,11 +68,8 @@ begin
 
     if options[:field].empty?
         result = JGrep::jgrep((json), expression, nil, options[:start])
-        unless result == [] or options[:quiet] == true
+        unless options[:quiet] == true
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
-        end
-        if result.length == 0
-            exit 1
         end
     else
         if options[:field].size > 1

@@ -68,7 +68,6 @@ module JGrep
 
         rescue JSON::ParserError => e
             STDERR.puts "Error. Invalid JSON given"
-            exit 1
         end
     end
 
@@ -304,7 +303,7 @@ module JGrep
                 break
             end
         end
-        field = field[1].first.split(/=|<|>/).first
+        field = field[1].split(/=|<|>/).first
 
         field.split(".").each_with_index do |item, i|
             tmp = tmp[item]
@@ -372,8 +371,13 @@ module JGrep
 
     #Digs to a specific path in the json document and returns the value
     def self.dig_path(json, path)
-
+        index = nil
         path = path.gsub(/^\./, "")
+
+        if path =~ /(.*)\[(.*)\]/
+            path = $1
+            index = $2
+        end
 
         if path == ""
             return json
@@ -381,7 +385,7 @@ module JGrep
 
         if json.is_a? Hash
             json.keys.each do |k|
-                if path.match(/^#{k}/) && k.match(/\./)
+                if path.start_with?(k) && k.include?('.')
                     return dig_path(json[k], path.gsub(k, ""))
                 end
             end
@@ -404,7 +408,7 @@ module JGrep
             if path == path_array.first
                 return json
             else
-                return dig_path(json, (path.match(/\./) ? path_array.drop(1).join(".") : path))
+                return dig_path(json, (path.include?('.') ? path_array.drop(1).join(".") : path))
             end
 
         elsif json.is_a? Array
@@ -413,13 +417,13 @@ module JGrep
             else
                 tmp = []
                 json.each do |j|
-                    tmp_path = dig_path(j, (path.match(/\./) ? path_array.drop(1).join(".") : path))
+                    tmp_path = dig_path(j, (path.include?('.') ? path_array.drop(1).join(".") : path))
                     unless tmp_path.nil?
                         tmp << tmp_path
                     end
                 end
                 unless tmp.empty?
-                    return tmp
+                    (index) ? (return tmp.flatten[index.to_i]) : (return tmp)
                 end
             end
 

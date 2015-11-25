@@ -13,9 +13,7 @@ module JGrep
 
             it "should fail on an invalid json document" do
                 STDERR.expects(:puts).with("Error. Invalid JSON given")
-                expect{
-                    result = JGrep::jgrep("[foo:]", "foo=1")
-                }.to raise_error("exit")
+                result = JGrep::jgrep("[foo:]", "foo=1")
             end
 
             it "should return '[]' if value is not present in document" do
@@ -137,6 +135,11 @@ module JGrep
 
             it "should return true if if document matches logical expression" do
                 result = JGrep::eval_statement({"foo" => 1, "bar" => 1}, [{"statement" => "foo=1"}, {"and" => "and"}, {"statement" => "bar=1"}])
+                result.should == true
+            end
+
+            it "should return true if if document matches logical expression array" do
+                result = JGrep::eval_statement({"foo" => ["bar" => 1]}, [{"statement" => [["statement", "foo.bar=1"]]}] )
                 result.should == true
             end
 
