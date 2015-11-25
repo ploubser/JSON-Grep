@@ -14,7 +14,7 @@ module JGrep
             end
 
             begin
-                case @arguments.split("")[@token_index]
+                case chr(@arguments[@token_index])
                     when "["
                         return "statement", gen_substatement
 
@@ -28,7 +28,7 @@ module JGrep
                         return ")", ")"
 
                     when "n"
-                        if (@arguments.split("")[@token_index + 1] == "o") && (@arguments.split("")[@token_index + 2] == "t") && ((@arguments.split("")[@token_index + 3] == " ") || (@arguments.split("")[@token_index + 3] == "("))
+                        if (chr(@arguments[@token_index + 1]) == "o") && (chr(@arguments[@token_index + 2]) == "t") && ((chr(@arguments[@token_index + 3]) == " ") || (chr(@arguments[@token_index + 3]) == "("))
                             @token_index += 2
                             return "not", "not"
                         else
@@ -39,7 +39,7 @@ module JGrep
                         return "not", "not"
 
                     when "a"
-                        if (@arguments.split("")[@token_index + 1] == "n") && (@arguments.split("")[@token_index + 2] == "d") && ((@arguments.split("")[@token_index + 3] == " ") || (@arguments.split("")[@token_index + 3] == "("))
+                        if (chr(@arguments[@token_index + 1]) == "n") && (chr(@arguments[@token_index + 2]) == "d") && ((chr(@arguments[@token_index + 3]) == " ") || (chr(@arguments[@token_index + 3]) == "("))
                             @token_index += 2
                             return "and", "and"
                         else
@@ -47,7 +47,7 @@ module JGrep
                         end
 
                     when "&"
-                        if(@arguments.split("")[@token_index +1] == "&")
+                        if(chr(@arguments[@token_index +1]) == "&")
                             @token_index +=1
                             return "and", "and"
                         else
@@ -55,7 +55,7 @@ module JGrep
                         end
 
                     when "o"
-                        if (@arguments.split("")[@token_index + 1] == "r") && ((@arguments.split("")[@token_index + 2] == " ") || (@arguments.split("")[@token_index + 2] == "("))
+                        if (chr(@arguments[@token_index + 1]) == "r") && ((chr(@arguments[@token_index + 2]) == " ") || (chr(@arguments[@token_index + 2]) == "("))
                             @token_index += 1
                             return "or", "or"
                         else
@@ -63,7 +63,7 @@ module JGrep
                         end
 
                     when "|"
-                        if(@arguments.split("")[@token_index +1] == "|")
+                        if(chr(@arguments[@token_index +1]) == "|")
                             @token_index +=1
                             return "or", "or"
                         else
@@ -75,9 +75,9 @@ module JGrep
                         i = @token_index + 1
 
                         begin
-                            value +=  @arguments.split("")[i]
+                            value +=  chr(@arguments[i])
                             i += 1
-                        end until (i >= @arguments.size)  || (@arguments.split("")[i] =~ /\s|\)/)
+                        end until (i >= @arguments.size)  || (chr(@arguments[i]) =~ /\s|\)/)
 
                         @token_index = i - 1
                         return "+", value
@@ -87,9 +87,9 @@ module JGrep
                         i = @token_index + 1
 
                         begin
-                            value +=  @arguments.split("")[i]
+                            value +=  chr(@arguments[i])
                             i += 1
-                        end until (i >= @arguments.size)  || (@arguments.split("")[i] =~ /\s|\)/)
+                        end until (i >= @arguments.size)  || (chr(@arguments[i]) =~ /\s|\)/)
 
                         @token_index = i - 1
                         return "-", value
@@ -124,26 +124,26 @@ module JGrep
             j = @token_index
 
             begin
-                if (@arguments.split("")[j] == "/")
+                if (chr(@arguments[j]) == "/")
                     begin
-                        current_token_value << @arguments.split("")[j]
+                        current_token_value << chr(@arguments[j])
                         j += 1
-                        if @arguments.split("")[j] == "/"
+                        if chr(@arguments[j]) == "/"
                             current_token_value << "/"
                             break
                         end
-                    end until (j >= @arguments.size) || (@arguments.split("")[j] =~ /\//)
+                    end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /\//)
                 else
                     begin
-                        current_token_value << @arguments.split("")[j]
+                        current_token_value << chr(@arguments[j])
                         j += 1
-                        if @arguments.split("")[j] =~ /'|"/
+                        if chr(@arguments[j]) =~ /'|"/
                             begin
-                                current_token_value << @arguments.split("")[j]
+                                current_token_value << chr(@arguments[j])
                                 j +=1
-                            end until (j >= @arguments.size) || (@arguments.split("")[j] =~ /'|"/)
+                            end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /'|"/)
                         end
-                    end until (j >= @arguments.size) || (@arguments.split("")[j] =~ /\s|\)|\]/)
+                    end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /\s|\)|\]/)
                 end
             rescue Exception => e
                 raise "Invalid token found - '#{current_token_value}'"
@@ -155,6 +155,11 @@ module JGrep
 
             @token_index += current_token_value.size - 1
             return "statement", current_token_value
+        end
+
+        # Compatibility with 1.8.7, which returns a Fixnum from String#[]
+        def chr(character)
+          character.chr unless character.nil?
         end
     end
 end
