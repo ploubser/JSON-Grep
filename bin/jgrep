@@ -3,7 +3,7 @@
 require 'jgrep'
 require 'optparse'
 
-options = {:flat => false, :start => nil, :field => []}
+options = {:flat => false, :start => nil, :field => [], :slice => nil}
 
 begin
     OptionParser.new do |opts|
@@ -34,6 +34,11 @@ begin
 
         opts.on("--start [FIELD]", "Where in the data to start from") do |field|
             options[:start] = field
+        end
+
+        opts.on("--slice [RANGE]", "A range of the form 'n' or 'n..m', indicating which documents to extract from the final output") do |field|
+            range_nums = field.split('..').map{ |x| x.to_i }
+            options[:slice] = range_nums.length == 1 ? range_nums[0] : Range.new(*range_nums)
         end
     end.parse!
 rescue OptionParser::InvalidOption => e
@@ -68,6 +73,7 @@ begin
 
     if options[:field].empty?
         result = JGrep::jgrep((json), expression, nil, options[:start])
+        result = result.slice(options[:slice]) if options[:slice]
         unless options[:quiet] == true
             (options[:flat] == false) ? puts(JSON.pretty_generate(result)) : puts(result.to_json)
         end
@@ -75,6 +81,7 @@ begin
         if options[:field].size > 1
             JGrep::validate_filters(options[:field])
             result = JGrep::jgrep((json), expression, options[:field], options[:start])
+            result = result.slice(options[:slice]) if options[:slice]
             unless result == [] or options[:quiet] == true
                 puts(JSON.pretty_generate(result))
             end
@@ -82,7 +89,8 @@ begin
         else
             JGrep::validate_filters(options[:field][0])
             result = JGrep::jgrep((json), expression, options[:field][0], options[:start])
-            unless result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash)
+            result = result.slice(options[:slice]) if options[:slice]
+            if result.is_a?(Array) && !(result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash))
                 unless options[:quiet] == true
                     result.map{|x| puts x unless x.nil?}
                 end
