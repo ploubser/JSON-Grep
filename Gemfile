@@ -3,5 +3,5 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'mocha'
-gem 'rake'
+gem 'rake', '< 11'
 gem 'rspec'
