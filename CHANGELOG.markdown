@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.1
+* Fix binary exit code to be 1 when no matches are found (Mickaël Canévet)
+
 ## 1.4.0
 * Expressions support matching true/false booleans (Boyan Tabakov)
 * `--slice` option added to jgrep to get array elements (Jon McKenzie)
