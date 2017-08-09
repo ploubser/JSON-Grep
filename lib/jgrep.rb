@@ -1,9 +1,7 @@
-#! /usr/lib/env ruby
-
-require 'parser/parser.rb'
-require 'parser/scanner.rb'
-require 'rubygems'
-require 'json'
+require "parser/parser.rb"
+require "parser/scanner.rb"
+require "rubygems"
+require "json"
 
 module JGrep
   @verbose = false
@@ -27,24 +25,23 @@ module JGrep
     begin
       JSON.create_id = nil
       json = JSON.parse(json)
-      if json.is_a? Hash
-        json = [json]
-      end
+      json = [json] if json.is_a?(Hash)
 
       json = filter_json(json, start).flatten if start
 
       result = []
-      unless expression == ""
+
+      if expression == ""
+        result = json
+      else
         call_stack = Parser.new(expression).execution_stack
 
         json.each do |document|
           begin
-            if eval_statement(document, call_stack)
-              result << document
-            end
-          rescue Exception => e
+            result << document if eval_statement(document, call_stack)
+          rescue Exception => e # rubocop:disable Lint/RescueException
             if @verbose
-              require 'pp'
+              require "pp"
               pp document
               STDERR.puts "Error - #{e} \n\n"
             else
@@ -52,21 +49,14 @@ module JGrep
             end
           end
         end
-      else
-        result = json
       end
 
-      unless errors == ""
-        puts errors
-      end
+      puts errors unless errors == ""
 
-      unless filters
-        return result
-      else
-        filter_json(result, filters)
-      end
+      return result unless filters
 
-    rescue JSON::ParserError => e
+      filter_json(result, filters)
+    rescue JSON::ParserError
       STDERR.puts "Error. Invalid JSON given"
     end
   end
@@ -85,7 +75,7 @@ module JGrep
   def self.hash_to_array(documents, mark)
     begin
       documents = JSON.parse(documents)
-    rescue JSON::ParserError => e
+    rescue JSON::ParserError
       STDERR.puts "Error. Invalid JSON given"
       exit 1
     end
@@ -93,18 +83,18 @@ module JGrep
     result = []
 
     begin
-      for i in 0..(documents.size - 1) do
+      0..(documents.size - 1).each do |i|
         tmp = documents[i]
         unless mark == ""
-          mark.split(".").each_with_index do |m,i|
-            tmp = tmp[m] unless i == mark.split(".").size - 1
+          mark.split(".").each_with_index do |m, idx|
+            tmp = tmp[m] unless idx == mark.split(".").size - 1
           end
         end
 
-        tmp[mark.split.last].each{|d| result << {"value" => d[1], "key" => d[0]}}
+        tmp[mark.split.last].each {|d| result << {"value" => d[1], "key" => d[0]}}
         tmp[mark.split.last] = result
       end
-    rescue Exception => e
+    rescue
       STDERR.puts "Error. Invalid position specified in JSON document"
       exit!
     end
@@ -119,27 +109,26 @@ module JGrep
   def self.array_to_hash(documents, mark, key)
     begin
       documents = JSON.parse(documents)
-    rescue JSON::ParserError => e
-      STDERR.puts "Error. Invalid JSON given"
+    rescue JSON::ParserError
+      STDERR.puts "Error. Invalid JSON given: %s" % $!.message
       exit 1
     end
 
     result = {}
 
     begin
-      for i in 0..(documents.size - 1) do
+      0..(documents.size - 1).each do |i|
         tmp = documents[i]
         unless mark == ""
-          mark.split(".").each_with_index do |m,i|
-            tmp = tmp[m] unless i == mark.split(".").size - 1
+          mark.split(".").each_with_index do |m, idx|
+            tmp = tmp[m] unless idx == mark.split(".").size - 1
           end
         end
 
-        tmp[mark.split(".").last].each{|d| result[d[key]] = d}
+        tmp[mark.split(".").last].each { |d| result[d[key]] = d }
         tmp[mark.split(".").last] = result
-
       end
-    rescue Exception => e
+    rescue
       STDERR.puts "Error. Invalid position specified in JSON document"
       exit!
     end
@@ -163,8 +152,6 @@ module JGrep
         end
         result << tmp_json
       end
-
-      result.flatten if (result.size == 1 && @flatten == true)
     else
       documents.each do |r|
         filtered_result = dig_path(r, filters)
@@ -173,9 +160,9 @@ module JGrep
           result << filtered_result
         end
       end
-
-      result.flatten if (result.size == 1 && @flatten == true)
     end
+
+    result.flatten if @flatten == true && result.size == 1
 
     result
   end
@@ -188,10 +175,8 @@ module JGrep
           raise "Invalid field for -s filter : '#{filter}'"
         end
       end
-    else
-      if filters =~ /=|<|>|^and$|^or$|^!$|^not$/
-        raise "Invalid field for -s filter : '#{filters}'"
-      end
+    elsif filters =~ /=|<|>|^and$|^or$|^!$|^not$/
+      raise "Invalid field for -s filter : '#{filters}'"
     end
 
     nil
@@ -200,24 +185,21 @@ module JGrep
   # Correctly format values so we can do the correct type of comparison
   def self.format(kvalue, value)
     if kvalue.to_s =~ /^\d+$/ && value.to_s =~ /^\d+$/
-      return Integer(kvalue), Integer(value)
+      [Integer(kvalue), Integer(value)]
     elsif kvalue.to_s =~ /^\d+.\d+$/ && value.to_s =~ /^\d+.\d+$/
-      return Float(kvalue), Float(value)
+      [Float(kvalue), Float(value)]
     else
-      return kvalue, value
+      [kvalue, value]
     end
   end
-
 
   # Check if the json key that is defined by statement is defined in the json document
   def self.present?(document, statement)
     statement.split(".").each do |key|
       if document.is_a? Hash
-        if document.has_value? nil
-          document.each do |k, v|
-            if document[k] == nil
-              document[k] = "null"
-            end
+        if document.value?(nil)
+          document.each do |k, _|
+            document[k] = "null" if document[k].nil?
           end
         end
       end
@@ -232,17 +214,15 @@ module JGrep
 
       document = document[key]
 
-      if document.nil?
-        return false
-      end
+      return false if document.nil?
     end
 
-    return true
+    true
   end
 
   # Check if key=value is present in document
   def self.has_object?(document, statement)
-    key,value = statement.split(/<=|>=|=|<|>/)
+    key, value = statement.split(/<=|>=|=|<|>/)
 
     if statement =~ /(<=|>=|<|>|=)/
       op = $1
@@ -252,51 +232,41 @@ module JGrep
 
     tmp = dig_path(document, key)
 
-    if tmp.is_a?(Array) and tmp.size == 1
-      tmp = tmp.first
-    end
+    tmp = tmp.first if tmp.is_a?(Array) && tmp.size == 1
 
-    tmp, value = format(tmp, (value.gsub(/"|'/, "") unless value.nil?))
+    tmp, value = format(tmp, (value.gsub(/"|'/, "") unless value.nil?)) # rubocop:disable Style/FormatString
 
     # Deal with null comparison
-    if tmp.nil? and value == "null"
-      return true
-    end
+    return true if tmp.nil? && value == "null"
 
     # Deal with booleans
-    if tmp == true and value == 'true'
-      return true
-    elsif tmp == false and value == 'false'
-      return true
-    end
+    return true if tmp == true && value == "true"
+    return true if tmp == false && value == "false"
 
     # Deal with regex matching
-    if ((value =~ /^\/.*\/$/) && tmp != nil)
-      (tmp.match(Regexp.new(value.gsub("/", "")))) ? (return true) : (return false)
+    if !tmp.nil? && value =~ /^\/.*\/$/
+      tmp.match(Regexp.new(value.delete("/"))) ? (return true) : (return false)
     end
 
     # Deal with everything else
     case op
     when "="
-      (tmp == value) ? (return true) : (return false)
+      return tmp == value
     when "<="
-      (tmp <= value) ? (return true) : (return false)
+      return tmp <= value
     when ">="
-      (tmp >= value) ? (return true) : (return false)
+      return tmp >= value
     when ">"
-      (tmp > value) ? (return true) : (return false)
+      return tmp > value
     when "<"
-      (tmp < value) ? (return true) : (return false)
+      return tmp < value
     end
   end
 
   # Check if key=value is present in a sub array
   def self.is_object_in_array?(document, statement)
-
     document.each do |item|
-      if has_object?(item,statement)
-        return true
-      end
+      return true if has_object?(item, statement)
     end
 
     false
@@ -319,38 +289,38 @@ module JGrep
 
     field = field[1].split(/=|<|>/).first
 
-    field.split(".").each_with_index do |item, i|
+    field.split(".").each_with_index do |item, _|
       tmp = tmp[item]
 
       return false if tmp.nil?
 
-      if tmp.is_a? Array
-        tmp.each do |doc|
-          result = []
+      next unless tmp.is_a?(Array)
 
-          compound.each do |token|
-            case token[0]
-            when "and"
-              result << "&&"
-            when "or"
-              result << "||"
-            when  /not|\!/
-              result << "!"
-            when "statement"
-              op = token[1].match(/.*<=|>=|=|<|>/)
-              left = token[1].split(op[0]).first.split(".").last
-              right = token[1].split(op[0]).last
-              new_statement = left + op[0] + right
-              result << has_object?(doc, new_statement)
-            end
+      tmp.each do |doc|
+        result = []
+
+        compound.each do |token|
+          case token[0]
+          when "and"
+            result << "&&"
+          when "or"
+            result << "||"
+          when /not|\!/
+            result << "!"
+          when "statement"
+            op = token[1].match(/.*<=|>=|=|<|>/)
+            left = token[1].split(op[0]).first.split(".").last
+            right = token[1].split(op[0]).last
+            new_statement = left + op[0] + right
+            result << has_object?(doc, new_statement)
           end
-
-          fresult << eval(result.join(" "))
-          (fresult << "||") unless doc == tmp.last
         end
 
-        return eval(fresult.join(" "))
+        fresult << eval(result.join(" ")) # rubocop:disable Security/Eval
+        (fresult << "||") unless doc == tmp.last
       end
+
+      return eval(fresult.join(" ")) # rubocop:disable Security/Eval
     end
   end
 
@@ -362,7 +332,7 @@ module JGrep
     callstack.each do |expression|
       case expression.keys.first
       when "statement"
-        if  expression.values.first.is_a? Array
+        if expression.values.first.is_a?(Array)
           result << has_complex?(document, expression.values.first)
         else
           result << has_object?(document, expression.values.first)
@@ -370,7 +340,7 @@ module JGrep
       when "+"
         result << present?(document, expression.values.first)
       when "-"
-        result << !(present?(document, expression.values.first))
+        result << !present?(document, expression.values.first)
       when "and"
         result << "&&"
       when "or"
@@ -384,7 +354,7 @@ module JGrep
       end
     end
 
-    eval(result.join(" "))
+    eval(result.join(" ")) # rubocop:disable Security/Eval
   end
 
   # Digs to a specific path in the json document and returns the value
@@ -397,19 +367,17 @@ module JGrep
       index = $2
     end
 
-    if path == ""
-      return json
-    end
+    return json if path == ""
 
     if json.is_a? Hash
       json.keys.each do |k|
-        if path.start_with?(k) && k.include?('.')
+        if path.start_with?(k) && k.include?(".")
           return dig_path(json[k], path.gsub(k, ""))
         end
       end
     end
 
-    path_array=path.split(".")
+    path_array = path.split(".")
 
     if path_array.first == "*"
       tmp = []
@@ -424,26 +392,23 @@ module JGrep
     json = json[path_array.first] if json.is_a? Hash
 
     if json.is_a? Hash
-      if path == path_array.first
-        return json
-      else
-        return dig_path(json, (path.include?('.') ? path_array.drop(1).join(".") : path))
-      end
+      return json if path == path_array.first
+      return dig_path(json, path.include?(".") ? path_array.drop(1).join(".") : path)
 
     elsif json.is_a? Array
-      if path == path_array.first && (json.first.is_a?(Hash) && !(json.first.keys.include?(path)))
+      if path == path_array.first && (json.first.is_a?(Hash) && !json.first.keys.include?(path))
         return json
-      else
-        tmp = []
-        json.each do |j|
-          tmp_path = dig_path(j, (path.include?('.') ? path_array.drop(1).join(".") : path))
-          unless tmp_path.nil?
-            tmp << tmp_path
-          end
-        end
-        unless tmp.empty?
-          (index) ? (return tmp.flatten[index.to_i]) : (return tmp)
-        end
+      end
+
+      tmp = []
+
+      json.each do |j|
+        tmp_path = dig_path(j, (path.include?(".") ? path_array.drop(1).join(".") : path))
+        tmp << tmp_path unless tmp_path.nil?
+      end
+
+      unless tmp.empty?
+        return index ? tmp.flatten[index.to_i] : tmp
       end
 
     elsif json.nil?

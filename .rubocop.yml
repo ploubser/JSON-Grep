@@ -1,0 +1,78 @@
+AllCops:
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+
+Style/NumericLiterals:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/FormatString:
+  EnforcedStyle: percent
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 200
+
+Performance/RegexpMatch:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 100
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/PredicateName:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false
+
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Metrics/BlockNesting:
+  Max: 4
+
+Style/AccessorMethodName:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Lint/Loop:
+  Enabled: false
