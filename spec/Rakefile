@@ -4,8 +4,8 @@ require "rspec/core/rake_task"
 
 desc "Run JGrep tests"
 RSpec::Core::RakeTask.new(:test) do |t|
-    t.pattern = "unit/*_spec.rb"
-    t.rspec_opts = "--format s --color --backtrace"
+  t.pattern = "unit/*_spec.rb"
+  t.rspec_opts = "--format s --color --backtrace"
 end
 
-task :default => :test
+task default: :test
