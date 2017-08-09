@@ -4,6 +4,16 @@ require File.dirname(__FILE__) + "/../spec_helper"
 
 module JGrep
   describe JGrep do
+    describe "#validate_expression" do
+      it "should be true for valid expressions" do
+        expect(JGrep.validate_expression("bob=true")).to be(true)
+      end
+
+      it "should return errors for invalid ones" do
+        expect(JGrep.validate_expression("something that is invalid")).to start_with("Error")
+      end
+    end
+
     describe "#jgrep" do
 
       it "should return a valid json document" do

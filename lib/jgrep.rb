@@ -71,6 +71,14 @@ module JGrep
     end
   end
 
+  # Validates an expression, true when no errors are found else a string representing the issues
+  def self.validate_expression(expression)
+    Parser.new(expression)
+    true
+  rescue
+    $!.message
+  end
+
   # Convert a specific hash inside a JSON document to an array
   # Mark is a string in the format foo.bar.baz that points to
   # the array in the document.
