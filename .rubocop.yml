@@ -35,6 +35,9 @@ Performance/RegexpMatch:
 Metrics/MethodLength:
   Max: 100
 
+Metrics/BlockLength:
+  Enabled: false
+
 Style/ConditionalAssignment:
   Enabled: false
 
