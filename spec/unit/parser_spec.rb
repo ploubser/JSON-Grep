@@ -7,47 +7,47 @@ module JGrep
     describe '#parse' do
       it "should parse statements seperated by '='" do
         parser = Parser.new("foo.bar=bar")
-        parser.execution_stack.should == [{"statement" => "foo.bar=bar"}]
+        expect(parser.execution_stack).to eq([{"statement" => "foo.bar=bar"}])
       end
 
       it "should parse statements seperated by '<'" do
         parser = Parser.new("foo.bar<1")
-        parser.execution_stack.should == [{"statement" => "foo.bar<1"}]
+        expect(parser.execution_stack).to eq([{"statement" => "foo.bar<1"}])
       end
 
       it "should parse statements seperated by '>'" do
         parser = Parser.new("foo.bar>1")
-        parser.execution_stack.should == [{"statement" => "foo.bar>1"}]
+        expect(parser.execution_stack).to eq([{"statement" => "foo.bar>1"}])
       end
 
       it "should parse statements seperated by '<='" do
         parser = Parser.new("foo.bar<=1")
-        parser.execution_stack.should == [{"statement" => "foo.bar<=1"}]
+        expect(parser.execution_stack).to eq([{"statement" => "foo.bar<=1"}])
       end
 
       it "should parse statements seperated by '>='" do
         parser = Parser.new("foo.bar>=1")
-        parser.execution_stack.should == [{"statement" => "foo.bar>=1"}]
+        expect(parser.execution_stack).to eq([{"statement" => "foo.bar>=1"}])
       end
 
       it "should parse statement sperated by '!='" do
         parser = Parser.new("foo.bar!=1")
-        parser.execution_stack.should == [{"not" => "not"}, {"statement" =>"foo.bar=1"}]
+        expect(parser.execution_stack).to eq([{"not" => "not"}, {"statement" =>"foo.bar=1"}])
       end
 
       it "should parse a + token" do
         parser = Parser.new("+foo")
-        parser.execution_stack.should == [{"+" => "foo"}]
+        expect(parser.execution_stack).to eq([{"+" => "foo"}])
       end
 
       it "should parse a - token" do
         parser = Parser.new("-foo")
-        parser.execution_stack.should == [{"-" => "foo"}]
+        expect(parser.execution_stack).to eq([{"-" => "foo"}])
       end
 
       it "should parse a correct 'and' token" do
         parser = Parser.new("foo.bar=123 and bar.foo=321")
-        parser.execution_stack.should == [{"statement" => "foo.bar=123"}, {"and" => "and"}, {"statement" => "bar.foo=321"}]
+        expect(parser.execution_stack).to eq([{"statement" => "foo.bar=123"}, {"and" => "and"}, {"statement" => "bar.foo=321"}])
       end
 
       it "should not parse an incorrect and token" do
@@ -58,7 +58,7 @@ module JGrep
 
       it "should parse a correct 'or' token" do
         parser = Parser.new("foo.bar=1 or bar.foo=1")
-        parser.execution_stack.should == [{"statement" => "foo.bar=1"}, {"or" => "or"}, {"statement" => "bar.foo=1"}]
+        expect(parser.execution_stack).to eq([{"statement" => "foo.bar=1"}, {"or" => "or"}, {"statement" => "bar.foo=1"}])
       end
 
       it "should not parse an incorrect and token" do
@@ -69,9 +69,9 @@ module JGrep
 
       it "should parse a correct 'not' token" do
         parser = Parser.new("! bar.foo=1")
-        parser.execution_stack.should == [{"not" => "not"}, {"statement" => "bar.foo=1"}]
+        expect(parser.execution_stack).to eq([{"not" => "not"}, {"statement" => "bar.foo=1"}])
         parser = Parser.new("not bar.foo=1")
-        parser.execution_stack.should == [{"not" => "not"}, {"statement" => "bar.foo=1"}]
+        expect(parser.execution_stack).to eq([{"not" => "not"}, {"statement" => "bar.foo=1"}])
       end
 
       it "should not parse an incorrect 'not' token" do
@@ -82,7 +82,7 @@ module JGrep
 
       it "should parse correct parentheses" do
         parser = Parser.new("(foo.bar=1)")
-        parser.execution_stack.should == [{"(" => "("}, {"statement" => "foo.bar=1"}, {")" => ")"}]
+        expect(parser.execution_stack).to eq([{"(" => "("}, {"statement" => "foo.bar=1"}, {")" => ")"}])
       end
 
       it "should fail on incorrect parentheses" do
@@ -99,14 +99,14 @@ module JGrep
 
       it "should parse correctly formatted compound statements" do
         parser = Parser.new("(foo.bar=1 or foo.rab=1) and (bar.foo=1)")
-        parser.execution_stack.should == [{"(" => "("}, {"statement"=>"foo.bar=1"}, {"or"=>"or"}, {"statement"=>"foo.rab=1"},
+        expect(parser.execution_stack).to eq([{"(" => "("}, {"statement"=>"foo.bar=1"}, {"or"=>"or"}, {"statement"=>"foo.rab=1"},
                                           {")"=>")"}, {"and"=>"and"}, {"("=>"("}, {"statement"=>"bar.foo=1"},
-                                          {")"=>")"}]
+                                          {")"=>")"}])
       end
 
       it "should parse complex array statements" do
         parser = Parser.new("[foo.bar=1]")
-        parser.execution_stack.should == [{"statement" => [["statement","foo.bar=1"]]}]
+        expect(parser.execution_stack).to eq([{"statement" => [["statement","foo.bar=1"]]}])
       end
 
       it "should not parse failed complex array statements" do
@@ -125,7 +125,7 @@ module JGrep
 
       it "should parse complex, compound array statements" do
         parser = Parser.new("[foo.bar=1 and foo.rab=2] and !(foo=1)")
-        parser.execution_stack.should == [{"statement"=>[["statement", "foo.bar=1"], ["and", "and"], ["statement", "foo.rab=2"]]}, {"and"=>"and"}, {"not"=>"not"}, {"("=>"("}, {"statement"=>"foo=1"}, {")"=>")"}]
+        expect(parser.execution_stack).to eq([{"statement"=>[["statement", "foo.bar=1"], ["and", "and"], ["statement", "foo.rab=2"]]}, {"and"=>"and"}, {"not"=>"not"}, {"("=>"("}, {"statement"=>"foo=1"}, {")"=>")"}])
       end
     end
   end
