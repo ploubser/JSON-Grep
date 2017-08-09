@@ -1,55 +1,47 @@
 #!/usr/bin/env ruby
 
-require 'jgrep'
-require 'optparse'
+require "jgrep"
+require "optparse"
 
-@options = {:flat => false, :start => nil, :field => [], :slice => nil}
+@options = {flat: false, start: nil, field: [], slice: nil}
 
 def print_json(result)
-  unless @options[:flat]
+  if @options[:flat]
+    puts(result.first.to_json)
+  else
     result = result.first if @options[:stream]
     puts(JSON.pretty_generate(result))
-  else
-    puts(result.first.to_json)
   end
 end
 
 def do_grep(json, expression)
   if @options[:field].empty?
-    result = JGrep::jgrep((json), expression, nil, @options[:start])
+    result = JGrep.jgrep(json, expression, nil, @options[:start])
     result = result.slice(@options[:slice]) if @options[:slice]
 
     exit 1 if result == []
 
-    unless @options[:quiet] == true
-      print_json(result)
-    end
+    print_json(result) unless @options[:quiet] == true
+  elsif @options[:field].size > 1
+    JGrep.validate_filters(@options[:field])
+    result = JGrep.jgrep(json, expression, @options[:field], @options[:start])
+    result = result.slice(@options[:slice]) if @options[:slice]
+
+    exit 1 if result == []
+
+    print_json(result) unless @options[:quiet] == true
+
   else
-    if @options[:field].size > 1
-      JGrep::validate_filters(@options[:field])
-      result = JGrep::jgrep((json), expression, @options[:field], @options[:start])
-      result = result.slice(@options[:slice]) if @options[:slice]
-
-      exit 1 if result == []
-
+    JGrep.validate_filters(@options[:field][0])
+    result = JGrep.jgrep(json, expression, @options[:field][0], @options[:start])
+    result = result.slice(@options[:slice]) if @options[:slice]
+    exit 1 if result == []
+    if result.is_a?(Array) && !(result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash))
       unless @options[:quiet] == true
-        print_json(result)
+        result.map {|x| puts x unless x.nil?}
       end
-
     else
-      JGrep::validate_filters(@options[:field][0])
-      result = JGrep::jgrep((json), expression, @options[:field][0], @options[:start])
-      result = result.slice(@options[:slice]) if @options[:slice]
-      exit 1 if result == []
-      if result.is_a?(Array) && !(result.first.is_a?(Hash) || result.flatten.first.is_a?(Hash))
-        unless @options[:quiet] == true
-          result.map{|x| puts x unless x.nil?}
-        end
-      else
-        unless @options[:quiet] == true
-          print_json(result)
-        end
-      end
+      print_json(result) unless @options[:quiet] == true
     end
   end
 end
@@ -58,11 +50,9 @@ begin
   OptionParser.new do |opts|
     opts.banner = "Usage: jgrep [options] \"expression\""
     opts.on("-s", "--simple [FIELDS]", "Display only one or more fields from each of the resulting json documents") do |field|
-      unless field.nil?
-        @options[:field].concat(field.split(" "))
-      else
-        raise "-s flag requires a field value"
-      end
+      raise "-s flag requires a field value" if field.nil?
+
+      @options[:field].concat(field.split(" "))
     end
 
     opts.on("-c", "--compact", "Display non pretty json") do
@@ -74,7 +64,7 @@ begin
     end
 
     opts.on("-f", "--flatten", "Makes output as flat as possible") do
-      JGrep::flatten_on
+      JGrep.flatten_on
     end
 
     opts.on("-i", "--input [FILENAME]", "Specify input file to parse") do |filename|
@@ -86,7 +76,7 @@ begin
     end
 
     opts.on("-v", "--verbose", "Verbose output") do
-      JGrep::verbose_on
+      JGrep.verbose_on
     end
 
     opts.on("--start [FIELD]", "Where in the data to start from") do |field|
@@ -94,15 +84,14 @@ begin
     end
 
     opts.on("--slice [RANGE]", "A range of the form 'n' or 'n..m', indicating which documents to extract from the final output") do |field|
-      range_nums = field.split('..').map{ |x| x.to_i }
+      range_nums = field.split("..").map(&:to_i)
       @options[:slice] = range_nums.length == 1 ? range_nums[0] : Range.new(*range_nums)
     end
   end.parse!
 rescue OptionParser::InvalidOption => e
   puts e.to_s.capitalize
   exit 1
-
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   puts e
   exit 1
 end
@@ -125,33 +114,26 @@ begin
   # else find and load file from command line arugments
 
   if @options[:stream]
-    unless STDIN.tty?
-      while json = gets
-        do_grep(json, expression)
-      end
-    else
-      raise "No json input specified"
-    end
-  else
-    if @options[:file]
-      json = File.read(@options[:file])
-      do_grep(json, expression)
-    elsif ! STDIN.tty?
-      json = STDIN.read
-      do_grep(json, expression)
-    else
-      raise "No json input specified"
-    end
-  end
+    raise "No json input specified" if STDIN.tty?
 
+    while json = gets
+      do_grep(json, expression)
+    end
+  elsif @options[:file]
+    json = File.read(@options[:file])
+    do_grep(json, expression)
+  elsif !STDIN.tty?
+    json = STDIN.read
+    do_grep(json, expression)
+  else
+    raise "No json input specified"
+  end
 rescue Interrupt
   STDERR.puts "Exiting..."
   exit 1
-rescue Exception => e
-  if e.is_a?(SystemExit)
-    exit e.status
-  else
-    STDERR.puts "Error - #{e}"
-    exit 1
-  end
+rescue SystemExit
+  exit e.status
+rescue Exception => e # rubocop:disable Lint/RescueException
+  STDERR.puts "Error - #{e}"
+  exit 1
 end

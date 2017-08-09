@@ -79,3 +79,6 @@ Metrics/ClassLength:
 
 Lint/Loop:
   Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
