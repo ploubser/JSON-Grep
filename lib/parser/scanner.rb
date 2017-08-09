@@ -9,9 +9,7 @@ module JGrep
 
     # Scans the input string and identifies single language tokens
     def get_token
-      if @token_index >= @arguments.size
-        return nil
-      end
+      return nil if @token_index >= @arguments.size
 
       begin
         case chr(@arguments[@token_index])
@@ -47,8 +45,8 @@ module JGrep
           end
 
         when "&"
-          if(chr(@arguments[@token_index +1]) == "&")
-            @token_index +=1
+          if chr(@arguments[@token_index + 1]) == "&"
+            @token_index += 1
             return "and", "and"
           else
             gen_statement
@@ -63,8 +61,8 @@ module JGrep
           end
 
         when "|"
-          if(chr(@arguments[@token_index +1]) == "|")
-            @token_index +=1
+          if chr(@arguments[@token_index + 1]) == "|"
+            @token_index += 1
             return "or", "or"
           else
             gen_statement
@@ -75,9 +73,9 @@ module JGrep
           i = @token_index + 1
 
           begin
-            value +=  chr(@arguments[i])
+            value += chr(@arguments[i])
             i += 1
-          end until (i >= @arguments.size)  || (chr(@arguments[i]) =~ /\s|\)/)
+          end until (i >= @arguments.size) || (chr(@arguments[i]) =~ /\s|\)/)
 
           @token_index = i - 1
           return "+", value
@@ -87,13 +85,12 @@ module JGrep
           i = @token_index + 1
 
           begin
-            value +=  chr(@arguments[i])
+            value += chr(@arguments[i])
             i += 1
-          end until (i >= @arguments.size)  || (chr(@arguments[i]) =~ /\s|\)/)
+          end until (i >= @arguments.size) || (chr(@arguments[i]) =~ /\s|\)/)
 
           @token_index = i - 1
           return "-", value
-
 
         when " "
           return " ", " "
@@ -102,11 +99,12 @@ module JGrep
           gen_statement
         end
       end
-    rescue NoMethodError => e
+    rescue NoMethodError
       raise "Error. Expression cannot be parsed."
     end
 
     private
+
     def gen_substatement
       @token_index += 1
       returnval = []
@@ -124,7 +122,7 @@ module JGrep
       j = @token_index
 
       begin
-        if (chr(@arguments[j]) == "/")
+        if chr(@arguments[j]) == "/"
           begin
             current_token_value << chr(@arguments[j])
             j += 1
@@ -140,12 +138,12 @@ module JGrep
             if chr(@arguments[j]) =~ /'|"/
               begin
                 current_token_value << chr(@arguments[j])
-                j +=1
+                j += 1
               end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /'|"/)
             end
           end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /\s|\)|\]/)
         end
-      rescue Exception => e
+      rescue
         raise "Invalid token found - '#{current_token_value}'"
       end
 
@@ -155,7 +153,7 @@ module JGrep
 
       @token_index += current_token_value.size - 1
 
-      return "statement", current_token_value
+      ["statement", current_token_value]
     end
 
     # Compatibility with 1.8.7, which returns a Fixnum from String#[]
