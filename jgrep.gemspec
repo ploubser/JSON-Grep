@@ -3,7 +3,7 @@ require 'date'
 Gem::Specification.new do |s|
     s.name = "jgrep"
 
-    s.version = "1.4.1"
+    s.version = "1.5.0"
     s.date = Date.today.to_s
 
     s.summary = "Filter JSON documents with a simple logical language"
@@ -11,8 +11,8 @@ Gem::Specification.new do |s|
     s.homepage = "https://github.com/ploubser/JSON-Grep"
     s.license = "Apache-2.0"
 
-    s.authors = ["P Loubser", "Dominic Cleal"]
-    s.email = ["ploubser@gmail.com", "dominic@cleal.org"]
+    s.authors = ["P Loubser", "Dominic Cleal", "R.I. Pienaar"]
+    s.email = ["ploubser@gmail.com", "dominic@cleal.org", "rip@devco.net"]
 
     s.files = `git ls-files`.split("\n") - Dir[".*", "Gem*", "*.gemspec"]
     s.extra_rdoc_files = [
