@@ -1,12 +1,12 @@
 JGrep is a command line tool and API for parsing JSON documents based on logical expressions.
 
-###Installation:###
+### Installation:
 
 jgrep is available as a gem:
 
     gem install jgrep
 
-###JGrep binary usage:###
+### JGrep binary usage:
 
     jgrep [expression] -i foo.json
 
@@ -14,7 +14,7 @@ or
 
     cat "foo.json" | jgrep [expression]
 
-###Flags:###
+### Flags:
 
     -s, --simple [FIELDS]   : Greps the JSON and only returns the value of the field(s) specified
     -c, --compat            : Returns the JSON in its non-pretty flat form
@@ -26,7 +26,7 @@ or
         --start FIELD       : Starts the grep at a specific key in the document
         --slice [RANGE]     : A range of the form 'n' or 'n..m', indicating which documents to extract from the final output
 
-###Expressions###
+### Expressions:
 
 JGrep uses the following logical symbols to define expressions.
 
@@ -62,7 +62,7 @@ JGrep uses the following logical symbols to define expressions.
 
         Performs the operations inside the perentheses first.
 
-###Statements:###
+### Statements:
 
 A statement is defined as some value in a json document compared to another value.
 Available comparison operators are '=', '<', '>', '<=', '>='
@@ -73,7 +73,7 @@ Examples:
     foo.bar>0
     foo.bar<=1.3
 
-###Complex expressions:###
+### Complex expressions:
 
 Given a json document, {"foo":1, "bar":null}, the following are examples of valid expressions
 
@@ -95,12 +95,12 @@ Examples:
 
 ... returns true
 
-###CLI missing an expression###
+### CLI missing an expression:
 
 If JGrep is executed without a set expression, it will return an unmodified JSON document. The
 -s flag can still be applied to the result.
 
-###In document comparison:###
+### In document comparison:
 
 If a document contains an array, the '[' and ']' operators can be used to define a comparison where
 statements are checked for truth on a per element basis which will then be combined.
@@ -152,7 +152,7 @@ will return
 
 **Note**: In document comparison cannot be nested.
 
-###The -s flag###
+### The -s flag:
 
 The s flag simplifies the output returned by JGrep. Given a JSON document
 
@@ -167,7 +167,7 @@ will output
     1
 
 The s flag can also be used with multiple field, which will return JSON as output which only contain the specified fields.
-**Note**: Separate fields by a space and enclose all fields in quotes (see example below) 
+**Note**: Separate fields by a space and enclose all fields in quotes (see example below)
 
 Given:
 
@@ -190,7 +190,7 @@ will output
       }
     ]
 
-###The --start flag###
+### The --start flag:
 
 Some documents do not comply to our expected format, they might have an array embedded deep in a field.  The --start
 flag lets you pick a starting point for the grep.
@@ -230,7 +230,7 @@ With the --stream or -n flag, jgrep will process multiple JSON inputs (newline
 separated) until standard input is closed.  Each JSON input will be processed
 as usual, but the output immediately printed.
 
-###JGrep Gem usage:###
+### JGrep Gem usage:
 
     require 'jgrep'
 
@@ -242,3 +242,4 @@ as usual, but the output immediately printed.
     sflags = "foo"
 
     JGrep::jgrep(json, expression, sflags)
+
