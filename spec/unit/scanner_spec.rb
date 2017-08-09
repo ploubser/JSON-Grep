@@ -9,62 +9,62 @@ module JGrep
       it "should identify a '(' token" do
         scanner = Scanner.new("(")
         token = scanner.get_token
-        token.should == ["(", "("]
+        expect(token).to eq(["(", "("])
       end
 
       it "should identify a ')' token" do
         scanner = Scanner.new(")")
         token = scanner.get_token
-        token.should == [")", ")"]
+        expect(token).to eq([")", ")"])
       end
 
       it "should identify an 'and' token" do
         scanner = Scanner.new("and ")
         token = scanner.get_token
-        token.should == ["and", "and"]
+        expect(token).to eq(["and", "and"])
       end
 
       it "should identify a '&&' token" do
         scanner = Scanner.new("&& ")
         token = scanner.get_token
-        token.should == ["and", "and"]
+        expect(token).to eq(["and", "and"])
       end
 
       it "should identify an 'or' token" do
         scanner = Scanner.new("or ")
         token = scanner.get_token
-        token.should == ["or", "or"]
+        expect(token).to eq(["or", "or"])
       end
 
       it "should identify a "||" token" do
         scanner = Scanner.new("|| ")
         token = scanner.get_token
-        token.should == ["or", "or"]
+        expect(token).to eq(["or", "or"])
 
       end
 
       it "should identify an 'not' token" do
         scanner = Scanner.new("not ")
         token = scanner.get_token
-        token.should == ["not", "not"]
+        expect(token).to eq(["not", "not"])
       end
 
       it "should identify an '!' token" do
         scanner = Scanner.new("!")
         token = scanner.get_token
-        token.should == ["not", "not"]
+        expect(token).to eq(["not", "not"])
       end
 
       it "should identify a statement token" do
         scanner = Scanner.new("foo.bar=bar")
         token = scanner.get_token
-        token.should == ["statement", "foo.bar=bar"]
+        expect(token).to eq(["statement", "foo.bar=bar"])
       end
 
       it "should identify a complex array statement" do
         scanner = Scanner.new("[foo=bar and bar=foo]")
         token = scanner.get_token
-        token.should == ["statement", [["statement", "foo=bar"], ["and", "and"], ["statement", "bar=foo"]]]
+        expect(token).to eq(["statement", [["statement", "foo=bar"], ["and", "and"], ["statement", "bar=foo"]]])
       end
 
       it "should fail if expression terminates with 'and'" do
@@ -78,13 +78,13 @@ module JGrep
       it "should identify a '+' token" do
         scanner = Scanner.new("+foo")
         token = scanner.get_token
-        token.should == ["+","foo"]
+        expect(token).to eq(["+","foo"])
       end
 
       it "should identify a '-' token" do
         scanner = Scanner.new("-foo")
         token = scanner.get_token
-        token.should == ["-", "foo"]
+        expect(token).to eq(["-", "foo"])
       end
     end
   end
