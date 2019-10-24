@@ -5,4 +5,4 @@ gemspec
 gem "mocha"
 gem "rake", "< 11"
 gem "rspec"
-gem "rubocop", "~> 0.49"
+gem "rubocop", "~> 0.49.1"
