@@ -141,7 +141,7 @@ module JGrep
                 j += 1
               end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /'|"/)
             end
-          end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /\s|\)|\]/)
+          end until (j >= @arguments.size) || (chr(@arguments[j]) =~ /\s|\)|\]/ && chr(@arguments[j - 1]) != '\\')
         end
       rescue
         raise "Invalid token found - '#{current_token_value}'"
