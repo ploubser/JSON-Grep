@@ -57,6 +57,12 @@ module JGrep
         expect(token).to eq(["statement", "foo.bar=bar"])
       end
 
+      it "should identify a statement token with escaped parentheses" do
+        scanner = Scanner.new("foo.bar=/baz\\(gronk\\)quux/")
+        token = scanner.get_token
+        expect(token).to eq(["statement", "foo.bar=/baz\\(gronk\\)quux/"])
+      end
+
       it "should identify a complex array statement" do
         scanner = Scanner.new("[foo=bar and bar=foo]")
         token = scanner.get_token
