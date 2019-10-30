@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.1
+* Now handles escaped parens when tokenising statements
+
 ## 1.5.0
 * Dropped support for Ruby 1.8.3
 * Added support for modern Ruby versions (Tested up to 2.4.0)
