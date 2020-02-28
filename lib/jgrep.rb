@@ -119,7 +119,7 @@ module JGrep
   def self.format(kvalue, value)
     if kvalue.to_s =~ /^\d+$/ && value.to_s =~ /^\d+$/
       [Integer(kvalue), Integer(value)]
-    elsif kvalue.to_s =~ /^\d+.\d+$/ && value.to_s =~ /^\d+.\d+$/
+    elsif kvalue.to_s =~ /^\d+\.\d+$/ && value.to_s =~ /^\d+\.\d+$/
       [Float(kvalue), Float(value)]
     else
       [kvalue, value]

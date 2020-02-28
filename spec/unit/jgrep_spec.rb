@@ -76,6 +76,12 @@ module JGrep
         expect(result1.is_a?(String)).to eq(true)
         expect(result2.is_a?(String)).to eq(true)
       end
+
+      it 'should not format strings with a single [^\d\.] character' do
+        result1, result2 = JGrep.format("2012R2", "2008R2")
+        expect(result1).to be_a(String)
+        expect(result2).to be_a(String)
+      end
     end
 
     describe "#has_object?" do
