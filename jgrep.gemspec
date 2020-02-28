@@ -3,7 +3,7 @@ require 'date'
 Gem::Specification.new do |s|
     s.name = "jgrep"
 
-    s.version = "1.5.1"
+    s.version = "1.5.2"
     s.date = Date.today.to_s
 
     s.summary = "Filter JSON documents with a simple logical language"
