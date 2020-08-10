@@ -177,7 +177,7 @@ module JGrep
     return true if tmp == false && value == "false"
 
     # Deal with regex matching
-    if !tmp.nil? && value =~ /^\/.*\/$/
+    if !tmp.nil? && tmp.is_a?(String) && value =~ /^\/.*\/$/
       tmp.match(Regexp.new(value.delete("/"))) ? (return true) : (return false)
     end
 
