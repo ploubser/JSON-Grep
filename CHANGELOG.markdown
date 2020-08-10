@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.3
+* Fix Ruby 2.7.0 deprecation warnings
+* Bump Rspec version in Gemfile
+
+## 1.5.2
+* Fixed an issue where strings like 2012R2 would get parsed as floats
+
 ## 1.5.1
 * Now handles escaped parens when tokenising statements
 
