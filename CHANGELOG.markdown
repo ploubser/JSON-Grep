@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.4
+* Include missing fixes for Ruby 2.7.0 deprecations
+
 ## 1.5.3
 * Fix Ruby 2.7.0 deprecation warnings
 * Bump Rspec version in Gemfile
