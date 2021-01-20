@@ -36,7 +36,7 @@ JGrep uses the following logical symbols to define expressions.
         Evaluates to true if both statements are true
 
     'or' :
-        - [statement] and [statement]
+        - [statement] or [statement]
 
         Evaluates true if either statement is true
 
