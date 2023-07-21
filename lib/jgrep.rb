@@ -7,18 +7,27 @@ module JGrep
   @verbose = false
   @flatten = false
 
+  # @return [nil]
   def self.verbose_on
     @verbose = true
   end
 
+  # @return [nil]
   def self.flatten_on
     @flatten = true
   end
 
   # Parse json and return documents that match the logical expression
-  # Filters define output by limiting it to only returning a the listed keys.
-  # Start allows you to move the pointer indicating where parsing starts.
-  # Default is the first key in the document heirarchy
+  #
+  # @param json [String]
+  #   The data to grep through.
+  # @param expression [String]
+  #   The expression to filter the data.
+  # @param filters
+  #   Define output by limiting it to only returning the listed keys.
+  # @param start
+  #   Allows you to move the pointer indicating where parsing starts.
+  #   Default is the first key in the document hierarchy
   def self.jgrep(json, expression, filters = nil, start = nil)
     errors = ""
 
@@ -61,7 +70,11 @@ module JGrep
     end
   end
 
-  # Validates an expression, true when no errors are found else a string representing the issues
+  # Validates an expression
+  # @param expression [String]
+  #   The expression to validate
+  # @return [true] when no errors are found
+  # @return [String] The issues found
   def self.validate_expression(expression)
     Parser.new(expression)
     true
@@ -101,6 +114,8 @@ module JGrep
   end
 
   # Validates if filters do not match any of the parser's logical tokens
+  # @raise [Exception] if any filters do not match any of the parser's logical tokens
+  # @return [nil]
   def self.validate_filters(filters)
     if filters.is_a? Array
       filters.each do |filter|
@@ -116,6 +131,8 @@ module JGrep
   end
 
   # Correctly format values so we can do the correct type of comparison
+  #
+  # @return [Array[Any, 2]]
   def self.format(kvalue, value)
     if kvalue.to_s =~ /^\d+$/ && value.to_s =~ /^\d+$/
       [Integer(kvalue), Integer(value)]
@@ -127,6 +144,9 @@ module JGrep
   end
 
   # Check if the json key that is defined by statement is defined in the json document
+  #
+  # @param document [Variant[Hash,Array,nil]]
+  # @param statement [String]
   def self.present?(document, statement)
     statement.split(".").each do |key|
       if document.is_a? Hash
@@ -154,6 +174,9 @@ module JGrep
   end
 
   # Check if key=value is present in document
+  #
+  # @param document [Variant[Hash,Array,nil]]
+  # @param statement [String]
   def self.has_object?(document, statement)
     key, value = statement.split(/<=|>=|=|<|>/)
 
@@ -197,6 +220,9 @@ module JGrep
   end
 
   # Check if key=value is present in a sub array
+  #
+  # @param document [Array[Variant[Hash,Array,nil]]
+  # @param statement [String]
   def self.is_object_in_array?(document, statement)
     document.each do |item|
       return true if has_object?(item, statement)
@@ -291,6 +317,9 @@ module JGrep
   end
 
   # Digs to a specific path in the json document and returns the value
+  #
+  # @param json [Variant[Hash,Array,nil]]
+  # @param path [String]
   def self.dig_path(json, path)
     index = nil
     path = path.gsub(/^\./, "")
